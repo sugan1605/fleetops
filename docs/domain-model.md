@@ -37,26 +37,3 @@ Fuel type: Petrol
 Group: U
 Odometer: 84,230 km
 Status: Available
-
-## Business Rules To Define
-
-## Business Rules
-
-### Reservation Conflicts
-
-A vehicle must not be assigned to overlapping reservations.
-
-Example:
-
-Reservation A:
-10:00 → 14:00
-
-Reservation B:
-13:00 → 16:00
-
-The system must reject the second assignment.
-
-### Vehicle Availability
-
-A vehicle must not be assigned during a period where it is blocked
-for maintenance, damage, sale, or another reservation.
