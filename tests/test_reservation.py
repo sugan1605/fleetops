@@ -11,13 +11,13 @@ from app.vehicle import Vehicle
 @pytest.fixture
 def test_customer():
     customer = Customer(
-        customer_id=5656,
+        customer_id="PA-5656",
         customer_type="PARTNER",
         first_name="Losugan",
         last_name="Sivasuthan",
         email="ssv1605@test.com",
         phone_number="+47 21390016",
-    ),
+    )
 
     return customer
 
@@ -68,11 +68,10 @@ def test_reservation_is_not_active_before_start(test_customer, test_vehicle):
     start = datetime(2026, 9, 25, 17, 0)
     end = datetime(2026, 9, 30, 17, 0)
 
-
     reservation = Reservation(
-    customer=test_customer, vehicle=test_vehicle, start=start, end=end
-)
-    assert not reservation.is_active(datetime(2026, 9, 25, 16, 0 ))
+        customer=test_customer, vehicle=test_vehicle, start=start, end=end
+    )
+    assert not reservation.is_active(datetime(2026, 9, 25, 16, 0))
 
 
 def test_reservation_is_not_active_after_rent(test_customer, test_vehicle):
@@ -80,17 +79,22 @@ def test_reservation_is_not_active_after_rent(test_customer, test_vehicle):
     start = datetime(2026, 9, 25, 17, 0)
     end = datetime(2026, 9, 30, 17, 0)
 
-    reservation = Reservation(customer=test_customer, vehicle=test_vehicle, start=start, end=end)
+    reservation = Reservation(
+        customer=test_customer, vehicle=test_vehicle, start=start, end=end
+    )
 
     assert not reservation.is_active(datetime(2026, 10, 1, 10, 0))
 
-    #testing boundary
+    # testing boundary
+
 
 def test_reservation_is_active_at_start(test_customer, test_vehicle):
 
-    start = datetime(2026, 9, 25, 17, 0)    
+    start = datetime(2026, 9, 25, 17, 0)
     end = datetime(2026, 9, 30, 17, 0)
 
-    reservation = Reservation(customer=test_customer, vehicle=test_vehicle, start=start, end=end)
+    reservation = Reservation(
+        customer=test_customer, vehicle=test_vehicle, start=start, end=end
+    )
 
     assert reservation.is_active(start)

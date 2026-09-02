@@ -16,6 +16,9 @@ class Customer:
                 "invalid customer type, please choose right customer type!"
             )
 
+        if customer_type == "PARTNER" and not customer_id.startswith("PA"):
+            raise ValueError("The customer type doesn't match with customer ID!")
+
         self.customer_id = customer_id
         self.customer_type = customer_type
         self.first_name = first_name
