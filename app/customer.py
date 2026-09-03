@@ -1,5 +1,13 @@
+from typing import ClassVar
+
+
 class Customer:
-    customer_types = ("WORKSHOP", "BUSINESS", "LEISURE", "PARTNER")
+    customer_types: ClassVar[dict[str, str]] = {
+        "WORKSHOP": "WS",
+        "BUSINESS": "BU",
+        "LEISURE": "LE",
+        "PARTNER": "PA",
+    }
 
     def __init__(
         self,
@@ -12,11 +20,11 @@ class Customer:
     ):
 
         if customer_type not in self.customer_types:
-            raise ValueError(
-                "invalid customer type, please choose right customer type!"
-            )
+            raise ValueError("invalid customer type, please choose right customer type")
 
-        if customer_type == "PARTNER" and not customer_id.startswith("PA"):
+        expected_prefix = self.customer_types[customer_type]
+
+        if not customer_id.startswith(expected_prefix):
             raise ValueError("The customer type doesn't match with customer ID!")
 
         self.customer_id = customer_id

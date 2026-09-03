@@ -43,3 +43,15 @@ def test_customer_id_must_match_customer_type():
             email="test3@gmail.com",
             phone_number="+4721213232",
         )
+
+
+def test_customer_id_must_match_business_type():
+    with pytest.raises(ValueError):
+        Customer(
+            customer_id="LE-5054",
+            customer_type="BUSINESS",
+            first_name="Ola",
+            last_name="Normann",
+            email="test4@gmail.com",
+            phone_number="+39002451525"
+        )        
