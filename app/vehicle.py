@@ -2,6 +2,13 @@ from datetime import datetime
 
 
 class VehicleBlock:
+    VALID_BLOCK_TYPES = (
+        "RESERVATION",
+        "MAINTENANCE",
+        "DAMAGE",
+        "FOR_SALE",
+    )
+
     def __init__(
         self, block_type: str, start: datetime, end: datetime, block_reason: str
     ):
@@ -17,12 +24,7 @@ class VehicleBlock:
             raise ValueError("end date can't be earlier than start date.")
 
     def validate_block_type(self):
-        return self.block_type in [
-            "RESERVATION",
-            "MAINTENANCE",
-            "DAMAGE",
-            "FOR_SALE",
-        ]
+        return self.block_type in self.VALID_BLOCK_TYPES
 
 
 class Vehicle:
@@ -30,6 +32,12 @@ class Vehicle:
         "AVAILABLE",
         "RESERVED",
         "RENTED",
+    )
+
+    VALID_FUEL_TYPES = (
+        "Petrol",
+        "Diesel",
+        "Electric",
     )
 
     def __init__(
@@ -72,7 +80,7 @@ class Vehicle:
         self.blocks.append(block)
 
     def get_blocks(self):
-        return self.blocks
+        return list(self.blocks)
 
     def is_blocked(self, check_time: datetime):
         for block in self.blocks:
@@ -90,7 +98,7 @@ class Vehicle:
         self.odometer_km = new_odometer_km
 
     def validate_fuel_type(self):
-        return self.fuel_type in ["Petrol", "Electric", "Diesel"]
+        return self.fuel_type in self.VALID_FUEL_TYPES
 
     def validate_operational_status(self):
         return self.operational_status in self.VALID_OPERATIONAL_STATUSES
