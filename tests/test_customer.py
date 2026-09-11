@@ -31,3 +31,15 @@ def test_customer_rejects_invalid_customer_type():
             email="test4@gmail.com",
             phone_number="+49243434324",
         )
+
+
+def test_customer_id_must_match_customer_type():
+    with pytest.raises(ValueError):
+        Customer(
+            customer_id="LE-5024",
+            customer_type="PARTNER",
+            first_name="Ola",
+            last_name="Normann",
+            email="test3@gmail.com",
+            phone_number="+4721213232",
+        )
