@@ -98,7 +98,3 @@ def test_reservation_is_active_at_start(test_customer, test_vehicle):
     )
 
     assert reservation.is_active(start)
-
-
-
-
