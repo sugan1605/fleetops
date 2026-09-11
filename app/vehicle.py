@@ -108,3 +108,4 @@ class Vehicle:
             raise ValueError("Invalid operational status")
 
         self.operational_status = new_status
+
