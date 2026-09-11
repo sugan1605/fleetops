@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from app.vehicle import Vehicle
+from app.models.vehicle import Vehicle
 
 def get_available_vehicles(
     vehicles: list[Vehicle],

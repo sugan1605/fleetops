@@ -1,4 +1,4 @@
-from app.customer import Customer
+from app.models.customer import Customer
 import pytest
 
 

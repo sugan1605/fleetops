@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from app.customer import Customer
-from app.vehicle import Vehicle
+from app.models.customer import Customer
+from app.models.vehicle import Vehicle
 
 
 class Rental:

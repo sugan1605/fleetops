@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from app.vehicle import Vehicle, VehicleBlock
-from app.vehicle_service import get_available_vehicles
+from app.models.vehicle import Vehicle, VehicleBlock
+from app.services.vehicle_service import get_available_vehicles
 
 
 def test_vehicle_creation():

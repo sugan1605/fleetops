@@ -2,9 +2,9 @@ from datetime import datetime
 
 import pytest
 
-from app.customer import Customer
-from app.reservation import Reservation
-from app.vehicle import Vehicle
+from app.models.customer import Customer
+from app.models.reservation import Reservation
+from app.models.vehicle import Vehicle
 
 
 # Test fixtures
