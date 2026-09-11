@@ -1,5 +1,4 @@
 from app.customer import Customer
-
 import pytest
 
 
@@ -7,6 +6,7 @@ import pytest
 # Reusable test fixture providing a valid Customer.
 # Individual tests can modify this instance without repeating
 # the standard Customer setup.
+
 
 @pytest.fixture
 def test_customer():
@@ -20,6 +20,7 @@ def test_customer():
     )
 
     return customer
+
 
 # Invalid customer types should be rejected during creation.
 def test_customer_rejects_invalid_customer_type():
@@ -52,11 +53,13 @@ def test_customer_id_must_match_customer_type(customer_id, customer_type):
             phone_number="+4721213232",
         )
 
+
 # Customer names can be updated with valid values.
 def test_customer_can_edit_last_name(test_customer):
     test_customer.edit_last_name("Hansen")
 
     assert test_customer.last_name == "Hansen"
+
 
 # Contact information can be updated as long as
 # the Customer retains at least one contact method.
@@ -79,17 +82,20 @@ def test_customer_can_edit_email(test_customer):
 
     assert test_customer.email == "outlook@outlook.com"
 
+
 # A Customer cannot remove the phone number when no email is available.
 def test_customer_cannot_remove_phone_number_without_email(test_customer):
     test_customer.email = ""
     with pytest.raises(ValueError):
         test_customer.edit_phone_number("")
 
+
 # A Customer cannot remove the email when no phone number is available.
 def test_customer_cannot_remove_email_without_phone_number(test_customer):
     test_customer.phone_number = ""
     with pytest.raises(ValueError):
         test_customer.edit_email("")
+
 
 # First and last name are mandatory when creating a Customer.
 def test_customer_must_have_valid_first_name():
@@ -119,6 +125,18 @@ def test_customer_must_have_valid_last_name():
             last_name="",
             email="test6@test.no",
             phone_number="+47 77494928",
+        )
+
+
+def test_customer_must_at_least_have_one_contact_detail():
+    with pytest.raises(ValueError):
+        Customer(
+            customer_id="LE-5060",
+            customer_type="LEISURE",
+            first_name="Lars",
+            last_name="Monsen",
+            email="",
+            phone_number="",
         )
 
 

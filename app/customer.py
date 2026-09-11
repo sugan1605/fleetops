@@ -2,13 +2,9 @@ from typing import ClassVar
 
 
 class Customer:
-
-   # Centralized mapping between customer types and their ID prefixes.
-   # Keeping this in one place avoids hardcoding the same business rule
-   # throughout the application.
-
-
-
+    # Centralized mapping between customer types and their ID prefixes.
+    # Keeping this in one place avoids hardcoding the same business rule
+    # throughout the application.
 
     customer_types: ClassVar[dict[str, str]] = {
         "WORKSHOP": "WS",
@@ -32,6 +28,10 @@ class Customer:
         self._validate_required_name(first_name)
         self._validate_required_name(last_name)
 
+        if not email and not phone_number:
+            raise ValueError(
+                "Please provide email or phone number to continue, both can't be empty."
+            )
 
         # Only supported customer types should be allowed into the domain model.
         if customer_type not in self.customer_types:
@@ -43,7 +43,7 @@ class Customer:
         if not customer_id.startswith(expected_prefix):
             raise ValueError("The customer type doesn't match with customer ID!")
 
-       # Store the validated customer data on this Customer instance.
+        # Store the validated customer data on this Customer instance.
         self.customer_id = customer_id
         self.customer_type = customer_type
         self.first_name = first_name
@@ -78,7 +78,7 @@ class Customer:
 
     def edit_email(self, new_email: str):
         # The same contact rule applies when changing the email:
-        #removing the email is only allowed when a phone number exists.
+        # removing the email is only allowed when a phone number exists.
         if not new_email and not self.phone_number:
             raise ValueError("There must be at least one contact method.")
 
