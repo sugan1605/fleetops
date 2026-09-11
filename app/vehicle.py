@@ -2,7 +2,15 @@ from datetime import datetime
 
 
 class Vehicle:
-    def __init__(self,registration_number: str, make: str, model: str, fuel_type: str, operational_status: str = "AVAILABLE", odometer_km: int = 0):
+    def __init__(
+        self,
+        registration_number: str,
+        make: str,
+        model: str,
+        fuel_type: str,
+        operational_status: str = "AVAILABLE",
+        odometer_km: int = 0,
+    ):
         self.registration_number = registration_number
         self.make = make
         self.model = model
@@ -17,42 +25,67 @@ class Vehicle:
         if not self.validate_operational_status():
             raise ValueError("Invalid Status")
 
-    def add_block(self, block):
-        self.blocks.append(block)    
+    def is_available(self, start: datetime, end: datetime):
+        for block in self.blocks:
+            if start <= block.end and end >= block.start:
+                return False
 
+        return True
+
+    def add_block(self, block):
+        self.blocks.append(block)
+
+    def get_blocks(self):
+        return self.blocks
+
+    def is_blocked(self, check_time: datetime):
+        for block in self.blocks:
+            if check_time >= block.start and check_time <= block.end:
+                return True
+        return False
 
     def update_odometer(self, new_odometer_km):
-        if new_odometer_km <0:
-            raise ValueError("The updated km can't be less than 0") 
+        if new_odometer_km < 0:
+            raise ValueError("The updated km can't be less than 0")
         self.odometer_km = new_odometer_km
 
     def validate_fuel_type(self):
         return self.fuel_type in ["Petrol", "Electric", "Diesel"]
 
     def validate_operational_status(self):
-        return self.operational_status in ["AVAILABLE","RESERVED","RENTED"]
+        return self.operational_status in ["AVAILABLE", "RESERVED", "RENTED"]
 
-    def get_blocks(self):
-        return self.blocks 
 
 class VehicleBlock:
-    def __init__(self, block_type: str, start: datetime, end: datetime, block_reason: str ):
+    def __init__(
+        self, block_type: str, start: datetime, end: datetime, block_reason: str
+    ):
         self.block_type = block_type
         self.start = start
         self.end = end
-        self.block_reason = block_reason    
+        self.block_reason = block_reason
 
-      
+    def validate_block_type(self):
+        if not self.block_type in ["RESERVATION", "MAINTENANCE", "DAMAGE", "FOR_SALE"]:
+            raise ValueError("Invalid block type")
 
-        
+
 # Test Code
 
-vehicle = Vehicle(registration_number= "KJ 43629", make= "Toyota",model = "Rav 4", fuel_type = "Petrol", odometer_km=23000, operational_status="AVAILABLE")
+vehicle = Vehicle(
+    registration_number="KJ 43629",
+    make="Toyota",
+    model="Rav 4",
+    fuel_type="Petrol",
+    odometer_km=23000,
+    operational_status="AVAILABLE",
+)
+
 
 if vehicle.validate_fuel_type():
     print("Correct fueltype")
 else:
-    print("Invalid fueltype")    
+    print("Invalid fueltype")
 
 print(vehicle.odometer_km)
 
@@ -62,17 +95,28 @@ print(vehicle.odometer_km)
 print(vehicle.operational_status)
 
 
-vehicle_block = VehicleBlock(block_type= "MAINTENANCE", start= datetime(2026,9,21,17,0), end= datetime(2026,9,30,17,0), block_reason="Punctured tire",)
+vehicle_block = VehicleBlock(
+    block_type="MAINTENANCE",
+    start=datetime(2026, 9, 21, 17, 0),
+    end=datetime(2026, 9, 30, 17, 0),
+    block_reason="Punctured tire",
+)
+
+
 vehicle.add_block(vehicle_block)
 
+print(vehicle.is_blocked(datetime(2026, 9, 25, 12, 0)))
 
+print(
+    vehicle.is_available(
+        datetime(2026, 9, 10, 10, 0),
+        datetime(2026, 9, 28, 12, 0),
+    )
+)
 
-        
-print(vehicle.get_blocks())
-        
-       
-
-
-
-
-
+print(
+    vehicle.is_available(
+        datetime(2026, 9, 20, 12, 0),
+        datetime(2026, 9, 21, 12, 0),
+    )
+)
