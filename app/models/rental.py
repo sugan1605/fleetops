@@ -32,3 +32,17 @@ class Rental:
         self.start = start
         self.due = due
         self.status = status
+        self.return_time = None
+
+    def register_return(self, return_time: datetime):
+        if self.status != "ACTIVE":
+            raise ValueError(
+                "Only active rental can register a return."
+            )
+
+        if return_time < self.start:
+            raise ValueError(
+                "Return time can't be earlier than start time"
+            )
+
+        self.return_time = return_time

@@ -55,6 +55,7 @@ def test_rental_invalid_status(test_customer, test_vehicle):
             status="INVALID",
         )
 
+
 def test_rental_due_date_cannot_be_before_start_date(test_customer, test_vehicle):
     with pytest.raises(ValueError):
         Rental(
@@ -64,3 +65,47 @@ def test_rental_due_date_cannot_be_before_start_date(test_customer, test_vehicle
             due=datetime(2026, 9, 14, 17, 0),
             status="ACTIVE",
         )
+
+
+def test_active_rental_can_register_return(test_customer, test_vehicle):
+    rental = Rental(
+        test_customer,
+        test_vehicle,
+        start=datetime(2026, 9, 14, 21, 0),
+        due=datetime(2026, 9, 15, 21, 0),
+        status="ACTIVE",
+    )
+
+    rental.register_return(datetime(2026, 9, 15, 19, 30))
+
+    assert rental.return_time == datetime(2026, 9, 15, 19, 30)
+
+
+def test_non_active_rental_cannot_register_return(test_customer, test_vehicle):
+    rental = Rental(
+        test_customer,
+        test_vehicle,
+        start=datetime(2026, 9, 14, 21, 0),
+        due=datetime(2026, 9, 15, 21, 0),
+        status="COMPLETED",
+    )
+
+    with pytest.raises(ValueError):
+        rental.register_return(datetime(2026, 9, 15, 19, 30))
+
+    assert rental.return_time is None
+
+
+def test_return_cannot_be_before_rental_start(test_customer, test_vehicle):
+    rental = Rental(
+        test_customer,
+        test_vehicle,
+        start=datetime(2026, 9, 14, 17, 0),
+        due=datetime(2026, 9, 15, 17, 0),
+        status="ACTIVE",
+    )
+
+    with pytest.raises(ValueError):
+        rental.register_return(datetime(2026, 9, 13, 17, 0))
+
+    assert rental.return_time is None
