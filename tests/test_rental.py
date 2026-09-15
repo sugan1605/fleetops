@@ -26,6 +26,7 @@ def test_vehicle():
         make="Volvo",
         model="XC-60",
         fuel_type="Petrol",
+
     )
 
 
@@ -109,3 +110,119 @@ def test_return_cannot_be_before_rental_start(test_customer, test_vehicle):
         rental.register_return(datetime(2026, 9, 13, 17, 0))
 
     assert rental.return_time is None
+
+
+def test_rental_early_return(test_customer, test_vehicle):
+    rental = Rental(
+        test_customer,
+        test_vehicle,
+        start=datetime(2026, 9, 14, 17, 0),
+        due=datetime(2026, 9, 15, 17, 0),
+        status="ACTIVE",
+    )
+    rental.register_return(datetime(2026, 9, 15, 15, 0))
+
+    assert rental.return_status == "EARLY"
+
+
+def test_rental_on_time_return(test_customer, test_vehicle):
+    rental = Rental(
+        test_customer,
+        test_vehicle,
+        start=datetime(2026, 9, 15, 17, 0),
+        due=datetime(2026, 9, 20, 17, 0),
+        status="ACTIVE",
+    )
+    rental.register_return(datetime(2026, 9, 20, 17, 0))
+    assert rental.return_status == "ON_TIME"
+
+
+def test_rental_late_return(test_customer, test_vehicle):
+    rental = Rental(
+        test_customer,
+        test_vehicle,
+        start=datetime(2026, 9, 15, 17, 0),
+        due=datetime(2026, 9, 20, 17, 0),
+        status="ACTIVE",
+    )
+    rental.register_return(datetime(2026, 9, 20, 18, 0))
+    assert rental.return_status == "LATE"
+
+
+def test_cannot_register_return_twice(test_customer, test_vehicle):
+    rental = Rental(
+        test_customer,
+        test_vehicle,
+        start=datetime(2026, 9, 15, 17, 0),
+        due=datetime(2026, 9, 16, 17, 0),
+        status="ACTIVE",
+    )
+    rental.register_return(datetime(2026, 9, 16, 17, 0))
+    with pytest.raises(ValueError):
+        assert rental.register_return(datetime(2026, 9, 16, 17, 0))
+
+
+def test_check_in_time(test_customer, test_vehicle):
+    rental = Rental(
+        test_customer,
+        test_vehicle,
+        start=datetime(2026, 9, 15, 17, 0),
+        due=datetime(2026, 9, 16, 17, 0),
+        status="ACTIVE",
+    )
+    rental.check_in(check_in_time=datetime(2026, 9, 16, 17, 0), odometer_in=8000, fuel_in=8, condition="NO_NEW_DAMAGE")       
+    assert rental.check_in_time == (datetime(2026, 9, 16, 17, 0))
+
+
+def test_odometer_in(test_customer, test_vehicle):
+    rental = Rental(
+        test_customer,
+        test_vehicle,
+        start=datetime(2026, 9, 15, 17, 0),
+        due=datetime(2026, 9, 16, 17, 0),
+        status="ACTIVE",
+    )
+    rental.check_in(check_in_time=datetime(2026, 9, 16, 17, 0), odometer_in=8000, fuel_in=8, condition="NO_NEW_DAMAGE")
+    assert rental.odometer_in == 8000
+    
+
+
+
+def test_check_in_odometer_cannot_be_lower(test_customer, test_vehicle):
+    test_vehicle.odometer_km = 10000
+    rental = Rental(
+        test_customer,
+        test_vehicle,
+        start=datetime(2026, 9, 15, 17, 0),
+        due=datetime(2026, 9, 16, 17, 0),
+        status="ACTIVE",
+    )
+    with pytest.raises(ValueError):
+        rental.check_in(check_in_time=datetime(2026, 9, 16, 17, 0), odometer_in=8000, fuel_in=8, condition="NO_NEW_DAMAGE")
+    
+
+def test_fuel_in(test_customer, test_vehicle):
+    rental = Rental(
+        test_customer,
+        test_vehicle,
+        start=datetime(2026, 9, 15, 17, 0),
+        due=datetime(2026, 9, 16, 17, 0),
+        status="ACTIVE",
+    )
+    rental.check_in(check_in_time=datetime(2026, 9, 16, 17, 0), odometer_in=8000, fuel_in=8, condition="NO_NEW_DAMAGE")
+    assert rental.fuel_in == 8
+
+
+def test_vehicle_condition(test_customer, test_vehicle):
+    rental = Rental(
+        test_customer,
+        test_vehicle,
+        start=datetime(2026, 9, 15, 17, 0),
+        due=datetime(2026, 9, 16, 17, 0),
+        status="ACTIVE",
+    )
+    rental.check_in(check_in_time=datetime(2026, 9, 16, 17, 0), odometer_in=8000, fuel_in=8, condition="NEW_DAMAGE")
+    assert rental.condition == "NEW_DAMAGE"
+
+
+
