@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.models.vehicle import Vehicle, VehicleBlock
 from app.services.vehicle_service import get_available_vehicles
@@ -25,14 +25,14 @@ def test_vehicle_creation():
 def test_vehicle_block():
     vehicle_block = VehicleBlock(
         block_type="RESERVATION",
-        start=datetime(2026, 9, 25, 13, 0),
-        end=datetime(2026, 9, 29, 17, 0),
+        start=datetime(2026, 9, 25, 13, 0, tzinfo=timezone.utc),
+        end=datetime(2026, 9, 29, 17, 0, tzinfo=timezone.utc),
         block_reason="Customer reservation",
     )
 
     assert vehicle_block.block_type == "RESERVATION"
-    assert vehicle_block.start == datetime(2026, 9, 25, 13, 0)
-    assert vehicle_block.end == datetime(2026, 9, 29, 17, 0)
+    assert vehicle_block.start == datetime(2026, 9, 25, 13, 0, tzinfo=timezone.utc)
+    assert vehicle_block.end == datetime(2026, 9, 29, 17, 0, tzinfo=timezone.utc)
     assert vehicle_block.block_reason == "Customer reservation"
 
 
@@ -54,15 +54,15 @@ def test_get_available_vehicles():
 
     vehicle_block = VehicleBlock(
         block_type="RESERVATION",
-        start=datetime(2026, 9, 25, 13, 0),
-        end=datetime(2026, 9, 29, 17, 0),
+        start=datetime(2026, 9, 25, 13, 0, tzinfo=timezone.utc),
+        end=datetime(2026, 9, 29, 17, 0, tzinfo=timezone.utc),
         block_reason="Customer reservation",
     )
 
     vehicle_2.add_block(vehicle_block)
 
-    start = datetime(2026, 9, 26, 10, 0)
-    end = datetime(2026, 9, 28, 10, 0)
+    start = datetime(2026, 9, 26, 10, 0, tzinfo=timezone.utc)
+    end = datetime(2026, 9, 28, 10, 0, tzinfo=timezone.utc)
 
     # Act
     available_vehicles = get_available_vehicles(

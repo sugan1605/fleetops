@@ -2,6 +2,7 @@ from datetime import datetime
 
 from app.models.vehicle import Vehicle
 
+
 def get_available_vehicles(
     vehicles: list[Vehicle],
     start: datetime,

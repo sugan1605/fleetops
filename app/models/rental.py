@@ -22,6 +22,7 @@ class Rental:
     CHECK_IN_STATUSES = (
         "PENDING",
         "CHECKED-IN",
+        "FINALIZED",
     )
 
     CONDITION_STATUSES = (
@@ -77,18 +78,27 @@ class Rental:
         else:
             self.return_status = "LATE"
 
+    def check_in(
+        self, check_in_time: datetime, odometer_in: int, fuel_in: int, condition: str
+    ):
 
-    def check_in(self, check_in_time: datetime, odometer_in: int, fuel_in: int, condition: str):
+        if self.return_time is None:
+            raise ValueError("The car hasn't been returned. The check-in has to wait.")
+
+        if self.check_in_status == "CHECKED-IN":
+            raise ValueError("The car is already checked in.")
+
+        if check_in_time < self.return_time:
+            raise ValueError("Check-in time cannot be earlier than return time.")
 
         if odometer_in < self.vehicle.odometer_km:
             raise ValueError("The in km can't be lower than current km.")
 
         if condition not in self.CONDITION_STATUSES:
             raise ValueError("invalid condition entered")
-        
+
         self.check_in_time = check_in_time
         self.odometer_in = odometer_in
         self.fuel_in = fuel_in
         self.condition = condition
         self.check_in_status = "CHECKED-IN"
-            

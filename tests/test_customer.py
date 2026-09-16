@@ -1,7 +1,6 @@
-from app.models.customer import Customer
 import pytest
 
-
+from app.models.customer import Customer
 
 # Reusable test fixture providing a valid Customer.
 # Individual tests can modify this instance without repeating
