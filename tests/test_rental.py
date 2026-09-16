@@ -42,7 +42,7 @@ def test_rental_can_be_created(test_customer, test_vehicle):
     assert rental.customer is test_customer
     assert rental.vehicle is test_vehicle
     assert rental.start == datetime(2026, 9, 15, 17, 0, tzinfo=timezone.utc)
-    assert rental.due == datetime(2026, 9, 17, 17, 0 , tzinfo=timezone.utc)
+    assert rental.due == datetime(2026, 9, 17, 17, 0, tzinfo=timezone.utc)
     assert rental.status == "ACTIVE"
 
 
@@ -334,13 +334,14 @@ def test_check_in_odometer_cannot_be_lower_than_current(test_customer, test_vehi
             condition="NO_NEW_DAMAGE",
         )
 
+
 def test_rental_becomes_completed_when_vehicle_is_returned(test_customer, test_vehicle):
     rental = Rental(
-         test_customer,
-         test_vehicle,
-         start=datetime(2026, 9, 15, 17, 0, tzinfo=timezone.utc),
-         due=datetime(2026, 9, 16, 17, 0, tzinfo=timezone.utc),
-         status="ACTIVE",
+        test_customer,
+        test_vehicle,
+        start=datetime(2026, 9, 15, 17, 0, tzinfo=timezone.utc),
+        due=datetime(2026, 9, 16, 17, 0, tzinfo=timezone.utc),
+        status="ACTIVE",
     )
     rental.register_return(datetime(2026, 9, 16, 17, 0, tzinfo=timezone.utc))
 
@@ -353,9 +354,38 @@ def test_check_in_updates_current_odometer(test_customer, test_vehicle):
         test_vehicle,
         start=datetime(2026, 9, 15, 18, 0, tzinfo=timezone.utc),
         due=datetime(2026, 9, 16, 17, 0, tzinfo=timezone.utc),
-        status="ACTIVE"
+        status="ACTIVE",
     )
     rental.register_return(datetime(2026, 9, 16, 17, 0, tzinfo=timezone.utc))
-    rental.check_in(check_in_time=datetime(2026, 9, 17, 17, 0, tzinfo=timezone.utc), odometer_in= 8500, fuel_in=8, condition="NO_NEW_DAMAGE")
+    rental.check_in(
+        check_in_time=datetime(2026, 9, 17, 17, 0, tzinfo=timezone.utc),
+        odometer_in=8500,
+        fuel_in=8,
+        condition="NO_NEW_DAMAGE",
+    )
 
-    assert test_vehicle.odometer_km == 8500    
+    assert test_vehicle.odometer_km == 8500
+
+
+def test_check_in_marks_vehicle_as_dirty(test_customer, test_vehicle):
+    test_vehicle.operational_status = "ON_A_RENT"
+    test_vehicle.odometer_km = 8000
+
+    rental = Rental(
+        test_customer,
+        test_vehicle,
+        start=datetime(2026, 9, 15, 18, 0, tzinfo=timezone.utc),
+        due=datetime(2026, 9, 16, 17, 0, tzinfo=timezone.utc),
+        status="ACTIVE",
+    )
+    rental.register_return(datetime(2026, 9, 16, 17, 0, tzinfo=timezone.utc))
+    rental.check_in(
+        check_in_time=datetime(2026, 9, 16, 17, 0, tzinfo=timezone.utc),
+        odometer_in=8500,
+        fuel_in=8,
+        condition="NO_NEW_DAMAGE",
+    )
+
+    assert test_vehicle.operational_status == "DIRTY"
+
+

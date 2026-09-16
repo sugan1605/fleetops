@@ -1,7 +1,29 @@
 from datetime import datetime, timezone
 
+import pytest
+
 from app.models.vehicle import Vehicle, VehicleBlock
 from app.services.vehicle_service import get_available_vehicles
+
+
+@pytest.fixture
+def test_vehicle():
+    return Vehicle(
+        registration_number="SX 503335",
+        make="Volvo",
+        model="XC-60",
+        fuel_type="Petrol",
+        odometer_km=8000,
+    )
+
+@pytest.fixture
+def maintenance_block():
+    return VehicleBlock(
+        block_type="MAINTENANCE",
+        start=datetime(2026, 9, 15, 18, 0, tzinfo=timezone.utc),
+        end=datetime(2026, 9, 17, 18, 0, tzinfo=timezone.utc),
+        block_reason="Tire change"
+    )
 
 
 def test_vehicle_creation():
@@ -34,6 +56,23 @@ def test_vehicle_block():
     assert vehicle_block.start == datetime(2026, 9, 25, 13, 0, tzinfo=timezone.utc)
     assert vehicle_block.end == datetime(2026, 9, 29, 17, 0, tzinfo=timezone.utc)
     assert vehicle_block.block_reason == "Customer reservation"
+
+
+def test_dirty_vehicle_is_not_available(test_vehicle):
+    test_vehicle.operational_status = "DIRTY"
+
+    assert (
+    test_vehicle.is_available(
+    start=datetime(2026, 9, 15, 17, 0, tzinfo=timezone.utc),
+    end=datetime(2026, 9, 16, 17, 0, tzinfo=timezone.utc),
+    )
+        is False
+    )
+
+def test_vehicle_with_maintenance_block_is_not_available(test_vehicle, maintenance_block):
+    test_vehicle.add_block(maintenance_block)
+
+    assert test_vehicle.is_available(start=datetime(2026, 9, 14, 17, 0, tzinfo=timezone.utc), end=datetime(2026, 9, 17, 16, 30, tzinfo=timezone.utc)) is False
 
 
 def test_get_available_vehicles():
@@ -73,3 +112,6 @@ def test_get_available_vehicles():
 
     # Assert
     assert available_vehicles == [vehicle_1]
+
+
+

@@ -100,6 +100,7 @@ class Rental:
             raise ValueError("invalid condition entered")
 
         self.vehicle.odometer_km = odometer_in
+        self.vehicle.update_operational_status("DIRTY")
 
         self.check_in_time = check_in_time
         self.odometer_in = odometer_in

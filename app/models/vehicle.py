@@ -28,11 +28,7 @@ class VehicleBlock:
 
 
 class Vehicle:
-    VALID_OPERATIONAL_STATUSES = (
-        "AVAILABLE",
-        "RESERVED",
-        "RENTED",
-    )
+    VALID_OPERATIONAL_STATUSES = ("AVAILABLE", "RESERVED", "ON_A_RENT", "DIRTY")
 
     VALID_FUEL_TYPES = (
         "Petrol",
@@ -64,8 +60,12 @@ class Vehicle:
             raise ValueError("Invalid Status")
 
     def is_available(self, start: datetime, end: datetime):
+
         if end < start:
             raise ValueError("End date can't be earlier than start date")
+
+        if self.operational_status == "DIRTY":
+            return False
 
         for block in self.blocks:
             if start <= block.end and end >= block.start:
@@ -108,4 +108,3 @@ class Vehicle:
             raise ValueError("Invalid operational status")
 
         self.operational_status = new_status
-
