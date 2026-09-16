@@ -78,6 +78,8 @@ class Rental:
         else:
             self.return_status = "LATE"
 
+        self.status = "COMPLETED"    
+
     def check_in(
         self, check_in_time: datetime, odometer_in: int, fuel_in: int, condition: str
     ):
@@ -96,6 +98,8 @@ class Rental:
 
         if condition not in self.CONDITION_STATUSES:
             raise ValueError("invalid condition entered")
+
+        self.vehicle.odometer_km = odometer_in
 
         self.check_in_time = check_in_time
         self.odometer_in = odometer_in
