@@ -3,31 +3,64 @@
 A fictional fleet and rental operations platform inspired by real-world
 car rental workflows.
 
+
 ## Purpose
 
-FleetOps is a hands-on software engineering and portfolio project focused
-on building a realistic fleet and rental operations system from the ground up.
+FleetOps is a hands-on project where I am building a rental operations
+system from the ground up.
 
-The project is designed to demonstrate how a software system evolves from
-business requirements and domain modelling into application code, databases,
-APIs, testing, automation, and cloud infrastructure.
+I use the project to improve my Python and software engineering skills,
+while gradually introducing technologies used in Cloud and DevOps.
 
-## Core Features
+The idea is simple: start with the rental lifecycle and build the
+engineering around it step by step.
 
-- Reservation management
-- Unique reservation IDs
-- Vehicle assignment
-- Fleet availability
-- Ongoing rentals
-- Due-in vehicles
-- Overdue rentals
-- Vehicle maintenance and blocking
-- Vehicle details and history
-- Customer loyalty profiles
-- Complimentary upgrade eligibility
-- Business partners
-- Vehicle groups and equipment
-- Fleet and mileage management
+
+## Core Rental Lifecycle
+
+The core rental lifecycle is currently in place.
+
+The system currently handles:
+
+- Customer validation
+- Vehicle validation
+- Vehicle availability
+- Time-based vehicle blocks
+- Reservations
+- Rental validation
+- Active rentals
+- Vehicle returns
+- Early, on-time, and late returns
+- Rental completion when a vehicle is returned
+- Employee check-in
+- Odometer and fuel recording
+- Vehicle condition recording
+- Vehicle `DIRTY` status after check-in
+- Returning a prepared vehicle to `AVAILABLE`
+
+
+### Current lifecycle
+
+```text
+AVAILABLE
+    ↓
+RESERVED
+    ↓
+ON_A_RENT
+    ↓
+Customer returns vehicle
+    ↓
+Rental COMPLETED
+    ↓
+Employee check-in
+    ↓
+Vehicle DIRTY
+    ↓
+Cleaning / preparation
+    ↓
+AVAILABLE
+```
+
 
 ## Engineering Focus
 
@@ -40,7 +73,7 @@ The project will progressively cover:
 - Automated testing
 - Error handling
 - Docker
-- Git and GitHub
+- Git and Github
 - CI/CD
 - Azure
 - Infrastructure as Code with Terraform
@@ -48,37 +81,55 @@ The project will progressively cover:
 - Monitoring and observability
 - Security and configuration management
 
-## Development Philosophy
 
-FleetOps is being built through a hands-on,
-problem-solving approach.
+## Project Structure
 
-The goal is not simply to make the application work, but to understand:
+```text
+fleetops/
+├── app/
+│   ├── models/
+│   ├── services/
+│   └── main.py
+├── docs/
+├── tests/
+├── .gitignore
+├── pyproject.toml
+└── README.md
+```
 
-- Why a particular design is chosen
-- How the different components interact
-- How the system can fail
-- How problems can be tested and debugged
-- How the application can evolve as requirements change
 
-Development follows the cycle:
+## Testing
 
-**Learn → Build → Test → Break → Debug → Explain → Improve**
+FleetOps uses `pytest` for automated testing.
 
-## Data & Privacy
+The tests currently cover:
 
-FleetOps is a fictional project inspired by real-world car rental
-operations.
+- Customer and rental validation
+- Vehicle availability
+- Vehicle blocks
+- Rental returns
+- Early, on-time, and late returns
+- Rental state changes
+- Vehicle check-in
+- Odometer updates
+- Vehicle operational status changes
+- Invalid inputs and business rules
 
-All customers, vehicles, reservations, partners, and operational data
-used in this repository are fictional.
+**Current status: 47 tests passing**
 
-No confidential company information, customer data, credentials,
-screenshots, or proprietary internal systems are used.
+Run the test suite with:
+
+```bash
+python3 -m pytest
+```
+
 
 ## Project Status
 
-🚧 **Early development**
+🚧 **Core Rental Lifecycle v1 — Complete**
 
-The project is being built incrementally as part of a hands-on
-software engineering and Cloud/DevOps learning journey.
+The core rental domain is implemented and covered by automated tests.
+
+The next phase will focus on building the application and infrastructure
+around the domain, starting with the API and database before moving into
+containerization, CI/CD, cloud infrastructure, and Kubernetes.
