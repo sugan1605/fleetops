@@ -53,6 +53,7 @@ class Rental:
         self.start = start
         self.due = due
         self.status = status
+        self.return_status = "NOT_RETURNED"
         self.return_time = None
         self.check_in_time = None
         self.odometer_in = None
@@ -87,11 +88,15 @@ class Rental:
 
         self.status = "COMPLETED"
 
+
+    def extend(self, new_due: datetime):
+            self.due = new_due        
+
     def check_in(
         self, check_in_time: datetime, odometer_in: int, fuel_in: int, condition: str
     ):
         # Operational event: an employee physically checks the returned
-        # vehicle and records its condition, milage and fuel level.
+        # vehicle and records its condition, mileage and fuel level.
 
         if self.return_time is None:
             raise ValueError("The car hasn't been returned. The check-in has to wait.")
@@ -108,7 +113,7 @@ class Rental:
         if condition not in self.CONDITION_STATUSES:
             raise ValueError("invalid condition entered")
 
-        self.vehicle.odometer_km = odometer_in
+        self.vehicle.update_odometer(odometer_in)
 
         # Once the employee has completed the physical check-in,
         # the vehicle is marked DIRTY because it still needs cleaning

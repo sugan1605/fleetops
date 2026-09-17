@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from datetime import datetime
+from typing import Optional
 
 from app.models.customer import Customer
 from app.models.vehicle import Vehicle
@@ -6,11 +9,15 @@ from app.models.vehicle import Vehicle
 
 class Reservation:
     def __init__(
-        self, customer: Customer, vehicle: Vehicle, start: datetime, end: datetime
+        self,
+        customer: Customer,
+        vehicle: Optional[Vehicle],
+        start: datetime,
+        end: datetime,
     ):
         if end < start:
             raise ValueError("end date can't be earlier than start date.")
-        
+
         self.customer = customer
         self.vehicle = vehicle
         self.start = start
@@ -19,9 +26,7 @@ class Reservation:
     def is_active(self, current_time: datetime) -> bool:
         return self.start <= current_time <= self.end
 
+    def assign_vehicle(self, vehicle: Optional[Vehicle]):
+        self.vehicle = vehicle
 
-    
-
-
-
-    
+ 

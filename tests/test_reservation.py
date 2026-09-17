@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 import pytest
 
@@ -36,10 +36,10 @@ def test_vehicle():
     return vehicle
 
 
-def test_reservation_creation(test_customer, test_vehicle):
+def test_reservation_rejects_end_before_start(test_customer, test_vehicle):
 
-    start = datetime(2026, 9, 25, 17, 0)
-    end = datetime(2026, 9, 20, 17, 0)
+    start = datetime(2026, 9, 25, 17, 0, tzinfo=timezone.utc)
+    end = datetime(2026, 9, 20, 17, 0, tzinfo=timezone.utc)
 
     # create reservation
     with pytest.raises(ValueError):
@@ -51,47 +51,115 @@ def test_reservation_creation(test_customer, test_vehicle):
         )
 
 
+def test_reservation_can_be_created_without_assigned_vehicle(test_customer):
+
+    start = datetime(2026, 9, 25, 17, 0, tzinfo=timezone.utc)
+    end = datetime(2026, 9, 25, 20, 0, tzinfo=timezone.utc)
+
+    reservation = Reservation(
+        test_customer,
+        vehicle=None,
+        start=start,
+        end=end,
+    )
+
+    assert reservation.vehicle is None
+
+
+def test_reservation_can_have_vehicle_after_creation(test_customer, test_vehicle):
+    start = datetime(2026, 9, 25, 17, 0, tzinfo=timezone.utc)
+    end = datetime(2026, 9, 25, 20, 0, tzinfo=timezone.utc)
+
+    reservation = Reservation(
+        test_customer,
+        vehicle=None,
+        start=start,
+        end=end,
+    )
+    reservation.assign_vehicle(test_vehicle)
+
+    assert reservation.vehicle is test_vehicle
+
+
+def test_reservation_vehicle_can_be_reassigned(test_customer, test_vehicle):
+    start = datetime(2026, 9, 25, 17, 0, tzinfo=timezone.utc)
+    end = datetime(2026, 9, 25, 20, 0, tzinfo=timezone.utc)
+
+    reservation = Reservation(
+        test_customer,
+        vehicle=test_vehicle,
+        start=start,
+        end=end,
+    )
+
+    new_vehicle = Vehicle(
+        registration_number="ER 54777",
+        make="AUDI",
+        model="Q6 E-tron",
+        fuel_type="Electric",
+        operational_status="AVAILABLE",
+        odometer_km=450,
+    )
+    reservation.assign_vehicle(new_vehicle)
+    assert reservation.vehicle is new_vehicle
+
+
+def test_reservation_vehicle_can_be_unassigned(test_customer, test_vehicle):
+    start = datetime(2026, 9, 25, 17, 0, tzinfo=timezone.utc)
+    end = datetime(2026, 9, 25, 20, 0, tzinfo=timezone.utc)
+
+    reservation = Reservation(
+        test_customer,
+        vehicle=test_vehicle,
+        start=start,
+        end=end,
+    )
+    reservation.assign_vehicle(None)
+
+    assert reservation.vehicle is None
+
+
 def test_reservation_is_active(test_customer, test_vehicle):
 
-    start = datetime(2026, 9, 25, 17, 0)
-    end = datetime(2026, 9, 30, 17, 0)
+    start = datetime(2026, 9, 25, 17, 0, tzinfo=timezone.utc)
+    end = datetime(2026, 9, 30, 17, 0, tzinfo=timezone.utc)
 
     reservation = Reservation(
         customer=test_customer, vehicle=test_vehicle, start=start, end=end
     )
 
-    assert reservation.is_active(datetime(2026, 9, 27, 12, 0))
+    assert reservation.is_active(datetime(2026, 9, 27, 12, 0, tzinfo=timezone.utc))
 
 
 def test_reservation_is_not_active_before_start(test_customer, test_vehicle):
 
-    start = datetime(2026, 9, 25, 17, 0)
-    end = datetime(2026, 9, 30, 17, 0)
+    start = datetime(2026, 9, 25, 17, 0, tzinfo=timezone.utc)
+    end = datetime(2026, 9, 30, 17, 0, tzinfo=timezone.utc)
 
     reservation = Reservation(
         customer=test_customer, vehicle=test_vehicle, start=start, end=end
     )
-    assert not reservation.is_active(datetime(2026, 9, 25, 16, 0))
+    assert not reservation.is_active(datetime(2026, 9, 25, 16, 0, tzinfo=timezone.utc))
 
 
 def test_reservation_is_not_active_after_rent(test_customer, test_vehicle):
 
-    start = datetime(2026, 9, 25, 17, 0)
-    end = datetime(2026, 9, 30, 17, 0)
+    start = datetime(2026, 9, 25, 17, 0, tzinfo=timezone.utc)
+    end = datetime(2026, 9, 30, 17, 0, tzinfo=timezone.utc)
 
     reservation = Reservation(
         customer=test_customer, vehicle=test_vehicle, start=start, end=end
     )
 
-    assert not reservation.is_active(datetime(2026, 10, 1, 10, 0))
+    assert not reservation.is_active(datetime(2026, 10, 1, 10, 0, tzinfo=timezone.utc))
 
     # testing boundary
 
 
 def test_reservation_is_active_at_start(test_customer, test_vehicle):
 
-    start = datetime(2026, 9, 25, 17, 0)
-    end = datetime(2026, 9, 30, 17, 0)
+    start = datetime(2026, 9, 25, 17, 0, tzinfo=timezone.utc)
+    end = datetime(2026, 9, 30, 17, 0, tzinfo=timezone.utc)
 
     reservation = Reservation(
         customer=test_customer, vehicle=test_vehicle, start=start, end=end
