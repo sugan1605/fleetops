@@ -75,6 +75,12 @@ def test_vehicle_with_maintenance_block_is_not_available(test_vehicle, maintenan
     assert test_vehicle.is_available(start=datetime(2026, 9, 14, 17, 0, tzinfo=timezone.utc), end=datetime(2026, 9, 17, 16, 30, tzinfo=timezone.utc)) is False
 
 
+def test_vehicle_can_be_marked_available_after_cleaning(test_vehicle):
+    test_vehicle.operational_status = "DIRTY"
+    test_vehicle.mark_ready()
+    assert test_vehicle.operational_status == "AVAILABLE"
+
+
 def test_get_available_vehicles():
     # Arrange
     vehicle_1 = Vehicle(

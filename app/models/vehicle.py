@@ -2,6 +2,8 @@ from datetime import datetime
 
 
 class VehicleBlock:
+    # Blocks represent reasons a vehicle cannot be allocated for a
+    # specific period, while operational_status represents its current state.
     VALID_BLOCK_TYPES = (
         "RESERVATION",
         "MAINTENANCE",
@@ -64,6 +66,9 @@ class Vehicle:
         if end < start:
             raise ValueError("End date can't be earlier than start date")
 
+        # A returned vehicle may still require cleaning/preparation.
+        # Therefore, DIRTY vehicles cannot be allocated to a new rental.
+
         if self.operational_status == "DIRTY":
             return False
 
@@ -108,3 +113,6 @@ class Vehicle:
             raise ValueError("Invalid operational status")
 
         self.operational_status = new_status
+
+    def mark_ready(self):
+        self.update_operational_status("AVAILABLE")
