@@ -4,7 +4,8 @@ import pytest
 
 from app.models.customer import Customer
 from app.models.reservation import Reservation
-from app.models.vehicle import Vehicle
+from app.models.vehicle import Vehicle, VehicleBlock
+from app.services.vehicle_service import assign_vehicle_to_reservation
 
 
 # Test fixtures
@@ -79,6 +80,43 @@ def test_reservation_can_have_vehicle_after_creation(test_customer, test_vehicle
     reservation.assign_vehicle(test_vehicle)
 
     assert reservation.vehicle is test_vehicle
+
+
+def test_available_vehicle_can_be_assigned_to_reservation(test_customer, test_vehicle):
+    reservation = Reservation(
+        test_customer,
+        None,
+        start=datetime(2026, 9, 20, 17, 0, tzinfo=timezone.utc),
+        end=datetime(2026, 9, 22, 17, 0, tzinfo=timezone.utc),
+    )
+    assign_vehicle_to_reservation(reservation, test_vehicle)
+
+    assert reservation.vehicle == test_vehicle
+
+
+def test_unavailable_vehicle_cannot_be_assigned_to_reservation(
+    test_customer, test_vehicle
+):
+    reservation = Reservation(
+        test_customer,
+        None,
+        start=datetime(2026, 9, 20, 17, 0, tzinfo=timezone.utc),
+        end=datetime(2026, 9, 22, 17, 0, tzinfo=timezone.utc),
+    )
+
+    test_vehicle.add_block(
+        VehicleBlock(
+            block_type="MAINTENANCE",
+            start=datetime(2026, 9, 21, 17, 0, tzinfo=timezone.utc),
+            end=datetime(2026, 9, 23, 17, 0, tzinfo=timezone.utc),
+            block_reason="Scheduled maintenance",
+        )
+    )
+
+    with pytest.raises(ValueError):
+        assign_vehicle_to_reservation(reservation, test_vehicle)
+
+    assert reservation.vehicle is None
 
 
 def test_reservation_vehicle_can_be_reassigned(test_customer, test_vehicle):
