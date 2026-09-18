@@ -92,11 +92,12 @@ class Rental:
     def extend(self, new_due: datetime):
         if new_due < self.due:
            raise ValueError("The new extension cannot be less than current due.")
-        self.due = new_due
 
         if self.status != "ACTIVE":
             raise ValueError("Only active rental can be extended.")
    
+        self.due = new_due
+        
 
     def check_in(
         self, check_in_time: datetime, odometer_in: int, fuel_in: int, condition: str

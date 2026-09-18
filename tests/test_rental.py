@@ -6,7 +6,7 @@ from app.models.customer import Customer
 from app.models.rental import Rental
 from app.models.reservation import Reservation
 from app.models.vehicle import Vehicle, VehicleBlock
-from app.services.rental_service import extend_rental
+from app.services.rental_service import extend_rental, validate_rental_overlap
 
 
 @pytest.fixture
@@ -441,36 +441,58 @@ def test_rental_completed_rental_cannot_extend_rental(test_customer, test_vehicl
         test_vehicle,
         start=datetime(2026, 9, 15, 17, 0, tzinfo=timezone.utc),
         due=datetime(2026, 9, 16, 17, 0, tzinfo=timezone.utc),
-        status="COMPLETED"
+        status="COMPLETED",
     )
     with pytest.raises(ValueError):
         extend_rental(rental, datetime(2026, 9, 17, 17, 0, tzinfo=timezone.utc), [])
 
 
-
-def test_rental_cannot_be_extended_if_car_blocked_for_service_or_sale(test_customer, test_vehicle):
+def test_rental_cannot_be_extended_if_car_blocked_for_service_or_sale(
+    test_customer, test_vehicle
+):
     rental = Rental(
         test_customer,
         test_vehicle,
         start=datetime(2026, 9, 15, 17, 0, tzinfo=timezone.utc),
         due=datetime(2026, 9, 16, 17, 0, tzinfo=timezone.utc),
-        status="ACTIVE"
+        status="ACTIVE",
     )
 
     service_block = VehicleBlock(
-        block_type = "MAINTENANCE",
-        start = datetime(2026, 9, 17, 17, 0, tzinfo=timezone.utc),
-        end = datetime(2026, 9, 19, 17, 0, tzinfo=timezone.utc),
-        block_reason="Yearly Service"
+        block_type="MAINTENANCE",
+        start=datetime(2026, 9, 17, 17, 0, tzinfo=timezone.utc),
+        end=datetime(2026, 9, 19, 17, 0, tzinfo=timezone.utc),
+        block_reason="Yearly Service",
     )
 
     test_vehicle.add_block(service_block)
 
-    
-    with pytest.raises(ValueError): 
-     extend_rental(rental, datetime(2026, 9, 18, 15, 0, tzinfo=timezone.utc), [])
-    
+    with pytest.raises(ValueError):
+        extend_rental(rental, datetime(2026, 9, 18, 15, 0, tzinfo=timezone.utc), [])
+
     assert rental.due == datetime(2026, 9, 16, 17, 0, tzinfo=timezone.utc)
+
+
+def test_same_vehicle_cannot_have_overlapping_rentals(test_customer, test_vehicle):
+    rental_one = Rental(
+        test_customer,
+        test_vehicle,
+        start=datetime(2026, 9, 15, 17, 0, tzinfo=timezone.utc),
+        due=datetime(2026, 9, 18, 17, 0, tzinfo=timezone.utc),
+        status="ACTIVE",
+    )
+    rental_two = Rental(
+        test_customer,
+        test_vehicle,
+        start=datetime(2026, 9, 17, 12, 0, tzinfo=timezone.utc),
+        due=datetime(2026, 9, 20, 17, 0, tzinfo=timezone.utc),
+        status="ACTIVE",
+    )
+    with pytest.raises(ValueError):
+        validate_rental_overlap(
+            rental_two,
+            [rental_one],
+        )
 
 
 def test_check_in_updates_current_odometer(test_customer, test_vehicle):

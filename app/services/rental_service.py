@@ -20,3 +20,13 @@ def extend_rental(rental: Rental, new_due: datetime, reservations: list[Reservat
         raise ValueError("Rental extension conflicts with a vehicle block.") 
        
     rental.extend(new_due)
+
+
+def validate_rental_overlap(rental: Rental, existing_rentals: list[Rental],):
+    for existing_rental in existing_rentals:
+        if(
+            existing_rental.vehicle == rental.vehicle
+            and rental.start < existing_rental.due
+            and rental.due > existing_rental.start
+        ):
+            raise ValueError("Rental conflicts with an existing rental.")    
