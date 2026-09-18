@@ -15,4 +15,8 @@ def extend_rental(rental: Rental, new_due: datetime, reservations: list[Reservat
             and new_due > reservation.start
         ):
             raise ValueError("Rental extension conflicts with an existing reservation.")
+
+    if rental.vehicle.is_blocked_during(rental.due, new_due):
+        raise ValueError("Rental extension conflicts with a vehicle block.") 
+       
     rental.extend(new_due)

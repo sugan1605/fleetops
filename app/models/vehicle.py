@@ -93,6 +93,15 @@ class Vehicle:
                 return True
         return False
 
+    def is_blocked_during(self, start: datetime, end: datetime) -> bool:
+        if end < start:
+            raise ValueError("End date can't be earlier than start date")
+
+        for block in self.blocks:
+            if start <= block.end and end >= block.start:
+                return True
+        return False    
+
     def update_odometer(self, new_odometer_km):
         if new_odometer_km < self.odometer_km:
             raise ValueError(
