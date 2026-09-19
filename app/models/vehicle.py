@@ -1,4 +1,5 @@
 from datetime import datetime
+from uuid import UUID, uuid4
 
 
 class VehicleBlock:
@@ -40,6 +41,7 @@ class Vehicle:
 
     def __init__(
         self,
+        vehicle_id: UUID,
         registration_number: str,
         make: str,
         model: str,
@@ -47,6 +49,7 @@ class Vehicle:
         operational_status: str = "AVAILABLE",
         odometer_km: int = 0,
     ):
+        self.vehicle_id = uuid4()
         self.registration_number = registration_number
         self.make = make
         self.model = model

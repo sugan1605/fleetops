@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from uuid import uuid4
 
 import pytest
 
@@ -7,8 +8,9 @@ from app.services.vehicle_service import get_available_vehicles
 
 
 @pytest.fixture
-def test_vehicle():
+def vehicle():
     return Vehicle(
+        vehicle_id=uuid4(),
         registration_number="SX 503335",
         make="Volvo",
         model="XC-60",
@@ -28,6 +30,7 @@ def maintenance_block():
 
 def test_vehicle_creation():
     vehicle = Vehicle(
+        vehicle_id=uuid4(),
         registration_number="DS 35467",
         make="Volvo",
         model="XC60",
@@ -58,32 +61,33 @@ def test_vehicle_block():
     assert vehicle_block.block_reason == "Customer reservation"
 
 
-def test_dirty_vehicle_is_not_available(test_vehicle):
-    test_vehicle.operational_status = "DIRTY"
+def test_dirty_vehicle_is_not_available(vehicle):
+    vehicle.operational_status = "DIRTY"
 
     assert (
-    test_vehicle.is_available(
+    vehicle.is_available(
     start=datetime(2026, 9, 15, 17, 0, tzinfo=timezone.utc),
     end=datetime(2026, 9, 16, 17, 0, tzinfo=timezone.utc),
     )
         is False
     )
 
-def test_vehicle_with_maintenance_block_is_not_available(test_vehicle, maintenance_block):
-    test_vehicle.add_block(maintenance_block)
+def test_vehicle_with_maintenance_block_is_not_available(vehicle, maintenance_block):
+    vehicle.add_block(maintenance_block)
 
-    assert test_vehicle.is_available(start=datetime(2026, 9, 14, 17, 0, tzinfo=timezone.utc), end=datetime(2026, 9, 17, 16, 30, tzinfo=timezone.utc)) is False
+    assert vehicle.is_available(start=datetime(2026, 9, 14, 17, 0, tzinfo=timezone.utc), end=datetime(2026, 9, 17, 16, 30, tzinfo=timezone.utc)) is False
 
 
-def test_vehicle_can_be_marked_available_after_cleaning(test_vehicle):
-    test_vehicle.operational_status = "DIRTY"
-    test_vehicle.mark_ready()
-    assert test_vehicle.operational_status == "AVAILABLE"
+def test_vehicle_can_be_marked_available_after_cleaning(vehicle):
+    vehicle.operational_status = "DIRTY"
+    vehicle.mark_ready()
+    assert vehicle.operational_status == "AVAILABLE"
 
 
 def test_get_available_vehicles():
     # Arrange
     vehicle_1 = Vehicle(
+        vehicle_id=uuid4(),
         registration_number="SX 35685",
         make="Toyota",
         model="RAV 4",
@@ -91,6 +95,7 @@ def test_get_available_vehicles():
     )
 
     vehicle_2 = Vehicle(
+        vehicle_id=uuid4(),
         registration_number="DS 355542",
         make="Volvo",
         model="XC-90",
