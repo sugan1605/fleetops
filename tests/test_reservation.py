@@ -5,6 +5,7 @@ import pytest
 from app.models.customer import Customer
 from app.models.reservation import Reservation
 from app.models.vehicle import Vehicle, VehicleBlock
+from app.services.rental_service import create_rental_from_reservation
 from app.services.vehicle_service import assign_vehicle_to_reservation
 
 
@@ -113,7 +114,9 @@ def test_unavailable_vehicle_cannot_be_assigned_to_reservation(
         )
     )
 
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError, match="Vehicle is unavailable for the reservation period."
+    ):
         assign_vehicle_to_reservation(reservation, test_vehicle)
 
     assert reservation.vehicle is None
@@ -204,3 +207,37 @@ def test_reservation_is_active_at_start(test_customer, test_vehicle):
     )
 
     assert reservation.is_active(start)
+
+
+def test_reservation_can_be_converted_to_rental(test_customer, test_vehicle):
+    start = datetime(2026, 9, 25, 17, 0, tzinfo=timezone.utc)
+    end = datetime(2026, 9, 30, 17, 0, tzinfo=timezone.utc)
+
+    reservation = Reservation(
+        customer=test_customer,
+        vehicle=test_vehicle,
+        start=start,
+        end=end,
+    )
+
+    rental = create_rental_from_reservation(reservation)
+
+    assert rental.customer is reservation.customer
+    assert rental.vehicle is reservation.vehicle
+    assert rental.start == reservation.start
+    assert rental.due == reservation.end
+    assert rental.status == "ACTIVE"
+
+
+def test_reservation_without_vehicle_cannot_create_rental(test_customer):
+    start = datetime(2026, 9, 25, 17, 0, tzinfo=timezone.utc)
+    end = datetime(2026, 9, 25, 17, 0, tzinfo=timezone.utc)
+
+    reservation = Reservation(
+        customer=test_customer, vehicle=None, start=start, end=end
+    )
+    with pytest.raises(
+        ValueError,
+        match="The reservation must have an assigned vehicle before creating the Rental",
+    ):
+        create_rental_from_reservation(reservation)

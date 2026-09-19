@@ -29,4 +29,18 @@ def validate_rental_overlap(rental: Rental, existing_rentals: list[Rental],):
             and rental.start < existing_rental.due
             and rental.due > existing_rental.start
         ):
-            raise ValueError("Rental conflicts with an existing rental.")    
+            raise ValueError("Rental conflicts with an existing rental.")
+
+
+
+def create_rental_from_reservation(reservation: Reservation) -> Rental:
+    if reservation.vehicle is None:
+        raise ValueError("The reservation must have an assigned vehicle before creating the Rental")
+    rental = Rental(
+        customer=reservation.customer,
+        vehicle=reservation.vehicle,
+        start=reservation.start,
+        due=reservation.end,
+        status="ACTIVE",
+    )
+    return rental
