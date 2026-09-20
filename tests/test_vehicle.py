@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from uuid import uuid4
 
 import pytest
@@ -22,8 +22,8 @@ def vehicle():
 def maintenance_block():
     return VehicleBlock(
         block_type="MAINTENANCE",
-        start=datetime(2026, 9, 15, 18, 0, tzinfo=timezone.utc),
-        end=datetime(2026, 9, 17, 18, 0, tzinfo=timezone.utc),
+        start=datetime(2026, 9, 15, 18, 0, tzinfo=UTC),
+        end=datetime(2026, 9, 17, 18, 0, tzinfo=UTC),
         block_reason="Tire change"
     )
 
@@ -50,14 +50,14 @@ def test_vehicle_creation():
 def test_vehicle_block():
     vehicle_block = VehicleBlock(
         block_type="RESERVATION",
-        start=datetime(2026, 9, 25, 13, 0, tzinfo=timezone.utc),
-        end=datetime(2026, 9, 29, 17, 0, tzinfo=timezone.utc),
+        start=datetime(2026, 9, 25, 13, 0, tzinfo=UTC),
+        end=datetime(2026, 9, 29, 17, 0, tzinfo=UTC),
         block_reason="Customer reservation",
     )
 
     assert vehicle_block.block_type == "RESERVATION"
-    assert vehicle_block.start == datetime(2026, 9, 25, 13, 0, tzinfo=timezone.utc)
-    assert vehicle_block.end == datetime(2026, 9, 29, 17, 0, tzinfo=timezone.utc)
+    assert vehicle_block.start == datetime(2026, 9, 25, 13, 0, tzinfo=UTC)
+    assert vehicle_block.end == datetime(2026, 9, 29, 17, 0, tzinfo=UTC)
     assert vehicle_block.block_reason == "Customer reservation"
 
 
@@ -66,8 +66,8 @@ def test_dirty_vehicle_is_not_available(vehicle):
 
     assert (
     vehicle.is_available(
-    start=datetime(2026, 9, 15, 17, 0, tzinfo=timezone.utc),
-    end=datetime(2026, 9, 16, 17, 0, tzinfo=timezone.utc),
+    start=datetime(2026, 9, 15, 17, 0, tzinfo=UTC),
+    end=datetime(2026, 9, 16, 17, 0, tzinfo=UTC),
     )
         is False
     )
@@ -75,7 +75,7 @@ def test_dirty_vehicle_is_not_available(vehicle):
 def test_vehicle_with_maintenance_block_is_not_available(vehicle, maintenance_block):
     vehicle.add_block(maintenance_block)
 
-    assert vehicle.is_available(start=datetime(2026, 9, 14, 17, 0, tzinfo=timezone.utc), end=datetime(2026, 9, 17, 16, 30, tzinfo=timezone.utc)) is False
+    assert vehicle.is_available(start=datetime(2026, 9, 14, 17, 0, tzinfo=UTC), end=datetime(2026, 9, 17, 16, 30, tzinfo=UTC)) is False
 
 
 def test_vehicle_can_be_marked_available_after_cleaning(vehicle):
@@ -104,15 +104,15 @@ def test_get_available_vehicles():
 
     vehicle_block = VehicleBlock(
         block_type="RESERVATION",
-        start=datetime(2026, 9, 25, 13, 0, tzinfo=timezone.utc),
-        end=datetime(2026, 9, 29, 17, 0, tzinfo=timezone.utc),
+        start=datetime(2026, 9, 25, 13, 0, tzinfo=UTC),
+        end=datetime(2026, 9, 29, 17, 0, tzinfo=UTC),
         block_reason="Customer reservation",
     )
 
     vehicle_2.add_block(vehicle_block)
 
-    start = datetime(2026, 9, 26, 10, 0, tzinfo=timezone.utc)
-    end = datetime(2026, 9, 28, 10, 0, tzinfo=timezone.utc)
+    start = datetime(2026, 9, 26, 10, 0, tzinfo=UTC)
+    end = datetime(2026, 9, 28, 10, 0, tzinfo=UTC)
 
     # Act
     available_vehicles = get_available_vehicles(

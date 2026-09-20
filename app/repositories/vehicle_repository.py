@@ -1,5 +1,4 @@
 ## In-memory list before I create database
-from typing import Optional
 from uuid import UUID
 
 from app.models.vehicle import Vehicle
@@ -15,5 +14,5 @@ class VehicleRepository:
     def get_all(self) -> list[Vehicle]:
         return list(self.vehicles.values())
 
-    def get_by_id(self, vehicle_id: UUID) -> Optional[Vehicle]:
+    def get_by_id(self, vehicle_id: UUID) -> Vehicle | None:
         return self.vehicles.get(vehicle_id)
