@@ -11,6 +11,10 @@ from app.services.rental_service import extend_rental, validate_rental_overlap
 
 
 @pytest.fixture
+def reservation_id():
+    return uuid4()
+
+@pytest.fixture
 def test_customer():
     return Customer(
         customer_id="PA-5052",
@@ -316,6 +320,7 @@ def test_rental_extension_is_rejected_when_vehicle_has_conflicting_reservation(
     )
 
     reservation = Reservation(
+        reservation_id=reservation_id,
         customer=test_customer,
         vehicle=vehicle,
         start=datetime(2026, 9, 20, 14, 30, tzinfo=UTC),
@@ -340,6 +345,7 @@ def test_rental_extention_is_allowed_when_no_reservation_conflicts(
     )
 
     reservation = Reservation(
+        reservation_id=reservation_id,
         customer=test_customer,
         vehicle=vehicle,
         start=datetime(2026, 9, 25, 14, 30, tzinfo=UTC),

@@ -26,6 +26,11 @@ def test_customer():
 
 
 @pytest.fixture
+def reservation_id():
+    return uuid4()
+
+
+@pytest.fixture
 def vehicle():
     vehicle = Vehicle(
         vehicle_id=uuid4(),
@@ -48,6 +53,7 @@ def test_reservation_rejects_end_before_start(test_customer, vehicle):
     # create reservation
     with pytest.raises(ValueError):
         Reservation(
+            reservation_id=reservation_id,
             customer=test_customer,
             vehicle=vehicle,
             start=start,
@@ -61,6 +67,7 @@ def test_reservation_can_be_created_without_assigned_vehicle(test_customer):
     end = datetime(2026, 9, 25, 20, 0, tzinfo=UTC)
 
     reservation = Reservation(
+        reservation_id,
         test_customer,
         vehicle=None,
         start=start,
@@ -75,6 +82,7 @@ def test_reservation_can_have_vehicle_after_creation(test_customer, vehicle):
     end = datetime(2026, 9, 25, 20, 0, tzinfo=UTC)
 
     reservation = Reservation(
+        reservation_id,
         test_customer,
         vehicle=None,
         start=start,
@@ -87,6 +95,7 @@ def test_reservation_can_have_vehicle_after_creation(test_customer, vehicle):
 
 def test_available_vehicle_can_be_assigned_to_reservation(test_customer, vehicle):
     reservation = Reservation(
+        reservation_id,
         test_customer,
         None,
         start=datetime(2026, 9, 20, 17, 0, tzinfo=UTC),
@@ -97,10 +106,9 @@ def test_available_vehicle_can_be_assigned_to_reservation(test_customer, vehicle
     assert reservation.vehicle == vehicle
 
 
-def test_unavailable_vehicle_cannot_be_assigned_to_reservation(
-    test_customer, vehicle
-):
+def test_unavailable_vehicle_cannot_be_assigned_to_reservation(test_customer, vehicle):
     reservation = Reservation(
+        reservation_id,
         test_customer,
         None,
         start=datetime(2026, 9, 20, 17, 0, tzinfo=UTC),
@@ -129,6 +137,7 @@ def test_reservation_vehicle_can_be_reassigned(test_customer, vehicle):
     end = datetime(2026, 9, 25, 20, 0, tzinfo=UTC)
 
     reservation = Reservation(
+        reservation_id,
         test_customer,
         vehicle=vehicle,
         start=start,
@@ -153,6 +162,7 @@ def test_reservation_vehicle_can_be_unassigned(test_customer, vehicle):
     end = datetime(2026, 9, 25, 20, 0, tzinfo=UTC)
 
     reservation = Reservation(
+        reservation_id,
         test_customer,
         vehicle=vehicle,
         start=start,
@@ -169,7 +179,11 @@ def test_reservation_is_active(test_customer, vehicle):
     end = datetime(2026, 9, 30, 17, 0, tzinfo=UTC)
 
     reservation = Reservation(
-        customer=test_customer, vehicle=vehicle, start=start, end=end
+        reservation_id=reservation_id,
+        customer=test_customer,
+        vehicle=vehicle,
+        start=start,
+        end=end,
     )
 
     assert reservation.is_active(datetime(2026, 9, 27, 12, 0, tzinfo=UTC))
@@ -181,7 +195,11 @@ def test_reservation_is_not_active_before_start(test_customer, vehicle):
     end = datetime(2026, 9, 30, 17, 0, tzinfo=UTC)
 
     reservation = Reservation(
-        customer=test_customer, vehicle=vehicle, start=start, end=end
+        reservation_id=reservation_id,
+        customer=test_customer,
+        vehicle=vehicle,
+        start=start,
+        end=end,
     )
     assert not reservation.is_active(datetime(2026, 9, 25, 16, 0, tzinfo=UTC))
 
@@ -192,7 +210,11 @@ def test_reservation_is_not_active_after_rent(test_customer, vehicle):
     end = datetime(2026, 9, 30, 17, 0, tzinfo=UTC)
 
     reservation = Reservation(
-        customer=test_customer, vehicle=vehicle, start=start, end=end
+        reservation_id=reservation_id,
+        customer=test_customer,
+        vehicle=vehicle,
+        start=start,
+        end=end,
     )
 
     assert not reservation.is_active(datetime(2026, 10, 1, 10, 0, tzinfo=UTC))
@@ -206,7 +228,11 @@ def test_reservation_is_active_at_start(test_customer, vehicle):
     end = datetime(2026, 9, 30, 17, 0, tzinfo=UTC)
 
     reservation = Reservation(
-        customer=test_customer, vehicle=vehicle, start=start, end=end
+        reservation_id=reservation_id,
+        customer=test_customer,
+        vehicle=vehicle,
+        start=start,
+        end=end,
     )
 
     assert reservation.is_active(start)
@@ -217,6 +243,7 @@ def test_reservation_can_be_converted_to_rental(test_customer, vehicle):
     end = datetime(2026, 9, 30, 17, 0, tzinfo=UTC)
 
     reservation = Reservation(
+        reservation_id=reservation_id,
         customer=test_customer,
         vehicle=vehicle,
         start=start,
@@ -224,7 +251,6 @@ def test_reservation_can_be_converted_to_rental(test_customer, vehicle):
     )
 
     rental = create_rental_from_reservation(reservation)
-
     assert rental.customer is reservation.customer
     assert rental.vehicle is reservation.vehicle
     assert rental.start == reservation.start
@@ -237,7 +263,11 @@ def test_reservation_without_vehicle_cannot_create_rental(test_customer):
     end = datetime(2026, 9, 25, 17, 0, tzinfo=UTC)
 
     reservation = Reservation(
-        customer=test_customer, vehicle=None, start=start, end=end
+        reservation_id=reservation_id,
+        customer=test_customer,
+        vehicle=None,
+        start=start,
+        end=end,
     )
     with pytest.raises(
         ValueError,
