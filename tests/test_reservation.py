@@ -7,7 +7,7 @@ from app.models.customer import Customer
 from app.models.reservation import Reservation
 from app.models.vehicle import Vehicle, VehicleBlock
 from app.services.rental_service import create_rental_from_reservation
-from app.services.vehicle_service import assign_vehicle_to_reservation
+from app.services.reservation_service import assign_vehicle_to_reservation
 
 
 # Test fixtures
