@@ -31,6 +31,13 @@ class VehicleBlock:
 
 
 class Vehicle:
+
+    def __eq__(self, other):
+        if not isinstance(other, Vehicle):
+           return NotImplemented
+
+        return self.vehicle_id == other.vehicle_id
+    
     VALID_OPERATIONAL_STATUSES = ("AVAILABLE", "RESERVED", "ON_A_RENT", "DIRTY")
 
     VALID_FUEL_TYPES = (
