@@ -6,6 +6,12 @@ class Customer:
     # Keeping this in one place avoids hardcoding the same business rule
     # throughout the application.
 
+    def __eq__(self, other):
+        if not isinstance(other, Customer):
+            return NotImplemented
+
+        return self.customer_id == other.customer_id
+
     customer_types: ClassVar[dict[str, str]] = {
         "WORKSHOP": "WS",
         "BUSINESS": "BU",
