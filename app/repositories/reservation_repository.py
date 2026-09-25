@@ -7,9 +7,13 @@ from app.repositories.vehicle_repository import VehicleRepository
 
 
 class ReservationRepository:
-    def __init__(self):
-        self.customer_repository = CustomerRepository()
-        self.vehicle_repository = VehicleRepository()
+    def __init__(
+        self,
+        customer_repository=CustomerRepository,
+        vehicle_repository=VehicleRepository,
+    ):
+        self.customer_repository = customer_repository
+        self.vehicle_repository = vehicle_repository
 
     def _row_to_reservation(self, row) -> Reservation:
         (
