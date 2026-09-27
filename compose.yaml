@@ -1,0 +1,31 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      FLEETOPS_DB_HOST: postgres
+      FLEETOPS_DB_NAME: fleetops
+      FLEETOPS_DB_USER: creativity
+      FLEETOPS_DB_PASSWORD: ${FLEETOPS_DB_PASSWORD}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:18
+    environment:
+      POSTGRES_DB: fleetops
+      POSTGRES_USER: creativity
+      POSTGRES_PASSWORD: ${FLEETOPS_DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U creativity -d fleetops"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
