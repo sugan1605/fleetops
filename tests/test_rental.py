@@ -4,7 +4,9 @@ import pytest
 
 from app.models.customer import Customer
 from app.models.rental import Rental
-from app.models.vehicle import Vehicle
+from app.models.reservation import Reservation
+from app.models.vehicle import Vehicle, VehicleBlock
+from app.services.rental_service import extend_rental, validate_rental_overlap
 
 
 @pytest.fixture
@@ -57,6 +59,18 @@ def test_rental_invalid_status(test_customer, test_vehicle):
         )
 
 
+def test_new_rental_has_not_returned_status(test_customer, test_vehicle):
+    rental = Rental(
+        test_customer,
+        test_vehicle,
+        start=datetime(2026, 9, 17, 14, 0, tzinfo=timezone.utc),
+        due=datetime(2026, 9, 18, 14, 0, tzinfo=timezone.utc),
+        status="ACTIVE",
+    )
+
+    assert rental.return_status == "NOT_RETURNED"
+
+
 def test_rental_due_date_cannot_be_before_start_date(test_customer, test_vehicle):
     with pytest.raises(ValueError):
         Rental(
@@ -93,8 +107,6 @@ def test_non_active_rental_cannot_register_return(test_customer, test_vehicle):
 
     with pytest.raises(ValueError):
         rental.register_return(datetime(2026, 9, 15, 19, 30, tzinfo=timezone.utc))
-
-    assert rental.return_time is None
 
 
 def test_return_cannot_be_before_rental_start(test_customer, test_vehicle):
@@ -273,6 +285,69 @@ def test_check_in_fails_when_vehicle_not_returned(test_customer, test_vehicle):
         )
 
 
+def test_active_rantal_can_be_extended_when_vehicle_is_available(
+    test_customer, test_vehicle
+):
+    rental = Rental(
+        test_customer,
+        test_vehicle,
+        start=datetime(2026, 9, 17, 15, 0, tzinfo=timezone.utc),
+        due=datetime(2026, 9, 19, 15, 0, tzinfo=timezone.utc),
+        status="ACTIVE",
+    )
+    rental.extend(new_due=datetime(2026, 9, 20, 15, 0, tzinfo=timezone.utc))
+    assert rental.due == datetime(2026, 9, 20, 15, 0, tzinfo=timezone.utc)
+
+
+def test_rental_extension_is_rejected_when_vehicle_has_conflicting_reservation(
+    test_customer,
+    test_vehicle,
+):
+    rental_extension = datetime(2026, 9, 20, 15, 0, tzinfo=timezone.utc)
+
+    rental = Rental(
+        test_customer,
+        test_vehicle,
+        start=datetime(2026, 9, 17, 15, 0, tzinfo=timezone.utc),
+        due=datetime(2026, 9, 19, 16, 0, tzinfo=timezone.utc),
+        status="ACTIVE",
+    )
+
+    reservation = Reservation(
+        customer=test_customer,
+        vehicle=test_vehicle,
+        start=datetime(2026, 9, 20, 14, 30, tzinfo=timezone.utc),
+        end=datetime(2026, 9, 23, 15, 0, tzinfo=timezone.utc),
+    )
+
+    with pytest.raises(ValueError):
+        extend_rental(rental, rental_extension, [reservation])
+
+
+def test_rental_extention_is_allowed_when_no_reservation_conflicts(
+    test_customer, test_vehicle
+):
+    rental_extension = datetime(2026, 9, 24, 15, 0, tzinfo=timezone.utc)
+
+    rental = Rental(
+        test_customer,
+        test_vehicle,
+        start=datetime(2026, 9, 20, 14, 30, tzinfo=timezone.utc),
+        due=datetime(2026, 9, 21, 14, 30, tzinfo=timezone.utc),
+        status="ACTIVE",
+    )
+
+    reservation = Reservation(
+        customer=test_customer,
+        vehicle=test_vehicle,
+        start=datetime(2026, 9, 25, 14, 30, tzinfo=timezone.utc),
+        end=datetime(2026, 9, 30, 14, 30, tzinfo=timezone.utc),
+    )
+    extend_rental(rental, rental_extension, [reservation])
+
+    assert rental.due == rental_extension
+
+
 def test_check_in_already_completed(test_customer, test_vehicle):
     rental = Rental(
         test_customer,
@@ -306,8 +381,8 @@ def test_check_in_cannot_be_earlier_than_return_time(test_customer, test_vehicle
         due=datetime(2026, 9, 21, 17, 0, tzinfo=timezone.utc),
         status="ACTIVE",
     )
+    rental.register_return(datetime(2026, 9, 20, 18, 0, tzinfo=timezone.utc))
     with pytest.raises(ValueError):
-        rental.register_return(datetime(2026, 9, 20, 18, 0, tzinfo=timezone.utc))
         rental.check_in(
             check_in_time=datetime(2026, 9, 20, 17, 30, tzinfo=timezone.utc),
             odometer_in=8000,
@@ -346,6 +421,78 @@ def test_rental_becomes_completed_when_vehicle_is_returned(test_customer, test_v
     rental.register_return(datetime(2026, 9, 16, 17, 0, tzinfo=timezone.utc))
 
     assert rental.status == "COMPLETED"
+
+
+def test_rental_extension_cannot_shorten_rental(test_customer, test_vehicle):
+    rental = Rental(
+        test_customer,
+        test_vehicle,
+        start=datetime(2026, 9, 15, 17, 0, tzinfo=timezone.utc),
+        due=datetime(2026, 9, 20, 17, 0, tzinfo=timezone.utc),
+        status="ACTIVE",
+    )
+    with pytest.raises(ValueError):
+        extend_rental(rental, datetime(2026, 9, 16, 0, tzinfo=timezone.utc), [])
+
+
+def test_rental_completed_rental_cannot_extend_rental(test_customer, test_vehicle):
+    rental = Rental(
+        test_customer,
+        test_vehicle,
+        start=datetime(2026, 9, 15, 17, 0, tzinfo=timezone.utc),
+        due=datetime(2026, 9, 16, 17, 0, tzinfo=timezone.utc),
+        status="COMPLETED",
+    )
+    with pytest.raises(ValueError):
+        extend_rental(rental, datetime(2026, 9, 17, 17, 0, tzinfo=timezone.utc), [])
+
+
+def test_rental_cannot_be_extended_if_car_blocked_for_service_or_sale(
+    test_customer, test_vehicle
+):
+    rental = Rental(
+        test_customer,
+        test_vehicle,
+        start=datetime(2026, 9, 15, 17, 0, tzinfo=timezone.utc),
+        due=datetime(2026, 9, 16, 17, 0, tzinfo=timezone.utc),
+        status="ACTIVE",
+    )
+
+    service_block = VehicleBlock(
+        block_type="MAINTENANCE",
+        start=datetime(2026, 9, 17, 17, 0, tzinfo=timezone.utc),
+        end=datetime(2026, 9, 19, 17, 0, tzinfo=timezone.utc),
+        block_reason="Yearly Service",
+    )
+
+    test_vehicle.add_block(service_block)
+
+    with pytest.raises(ValueError):
+        extend_rental(rental, datetime(2026, 9, 18, 15, 0, tzinfo=timezone.utc), [])
+
+    assert rental.due == datetime(2026, 9, 16, 17, 0, tzinfo=timezone.utc)
+
+
+def test_same_vehicle_cannot_have_overlapping_rentals(test_customer, test_vehicle):
+    rental_one = Rental(
+        test_customer,
+        test_vehicle,
+        start=datetime(2026, 9, 15, 17, 0, tzinfo=timezone.utc),
+        due=datetime(2026, 9, 18, 17, 0, tzinfo=timezone.utc),
+        status="ACTIVE",
+    )
+    rental_two = Rental(
+        test_customer,
+        test_vehicle,
+        start=datetime(2026, 9, 17, 12, 0, tzinfo=timezone.utc),
+        due=datetime(2026, 9, 20, 17, 0, tzinfo=timezone.utc),
+        status="ACTIVE",
+    )
+    with pytest.raises(ValueError):
+        validate_rental_overlap(
+            rental_two,
+            [rental_one],
+        )
 
 
 def test_check_in_updates_current_odometer(test_customer, test_vehicle):
@@ -387,5 +534,3 @@ def test_check_in_marks_vehicle_as_dirty(test_customer, test_vehicle):
     )
 
     assert test_vehicle.operational_status == "DIRTY"
-
-

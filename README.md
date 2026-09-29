@@ -9,8 +9,9 @@ car rental workflows.
 FleetOps is a hands-on project where I am building a rental operations
 system from the ground up.
 
-I use the project to improve my Python and software engineering skills,
-while gradually introducing technologies used in Cloud and DevOps.
+I use the project to strengthen my Python and software engineering skills
+while progressively introducing technologies and practices used in Cloud
+and DevOps.
 
 The idea is simple: start with the rental lifecycle and build the
 engineering around it step by step.
@@ -18,19 +19,23 @@ engineering around it step by step.
 
 ## Core Rental Lifecycle
 
-The core rental lifecycle is currently in place.
+The project currently covers the core domain logic for vehicles,
+customers, reservations and rentals.
 
-The system currently handles:
+The system handles:
 
 - Customer validation
 - Vehicle validation
 - Vehicle availability
 - Time-based vehicle blocks
 - Reservations
+- Vehicle assignment
 - Rental validation
+- Rental extensions
+- Prevention of overlapping rentals
 - Active rentals
 - Vehicle returns
-- Early, on-time, and late returns
+- Early, on-time and late returns
 - Rental completion when a vehicle is returned
 - Employee check-in
 - Odometer and fuel recording
@@ -73,7 +78,7 @@ The project will progressively cover:
 - Automated testing
 - Error handling
 - Docker
-- Git and Github
+- Git and GitHub
 - CI/CD
 - Azure
 - Infrastructure as Code with Terraform
@@ -107,6 +112,9 @@ The tests currently cover:
 - Customer and rental validation
 - Vehicle availability
 - Vehicle blocks
+- Vehicle assignment
+- Rental extensions
+- Rental overlap prevention
 - Rental returns
 - Early, on-time, and late returns
 - Rental state changes
@@ -115,7 +123,7 @@ The tests currently cover:
 - Vehicle operational status changes
 - Invalid inputs and business rules
 
-**Current status: 47 tests passing**
+**Current status: 61 tests passing**
 
 Run the test suite with:
 
@@ -123,13 +131,43 @@ Run the test suite with:
 python3 -m pytest
 ```
 
+Run the code quality checks with:
+
+```bash
+ruff check .
+```
+
 
 ## Project Status
 
-🚧 **Core Rental Lifecycle v1 — Complete**
+🚧 **Core Rental Lifecycle — In Progress **
 
 The core rental domain is implemented and covered by automated tests.
 
-The next phase will focus on building the application and infrastructure
-around the domain, starting with the API and database before moving into
-containerization, CI/CD, cloud infrastructure, and Kubernetes.
+Current development is focused on completing the reservation-to-rental workflow.
+
+The next phase will expand the application around the domain, starting with the
+API and database before progressively introducing containerization, CI/CD, cloud infrastructure
+and Kubernetes.
+
+
+## Development Philosophy
+
+FleetOps is developed through hands-on problem solving:
+
+Understand
+    ↓
+Design
+    ↓
+Build
+    ↓
+Test
+    ↓
+Debug
+    ↓
+Improve
+    ↓
+Commit
+
+The goal is to build a realistic project while developing an understanding
+of how software engineering and DevOps practices work together.
