@@ -1,4 +1,5 @@
 from datetime import datetime
+from uuid import UUID
 
 
 class VehicleBlock:
@@ -30,6 +31,13 @@ class VehicleBlock:
 
 
 class Vehicle:
+
+    def __eq__(self, other):
+        if not isinstance(other, Vehicle):
+           return NotImplemented
+
+        return self.vehicle_id == other.vehicle_id
+    
     VALID_OPERATIONAL_STATUSES = ("AVAILABLE", "RESERVED", "ON_A_RENT", "DIRTY")
 
     VALID_FUEL_TYPES = (
@@ -40,6 +48,7 @@ class Vehicle:
 
     def __init__(
         self,
+        vehicle_id: UUID,
         registration_number: str,
         make: str,
         model: str,
@@ -47,6 +56,7 @@ class Vehicle:
         operational_status: str = "AVAILABLE",
         odometer_km: int = 0,
     ):
+        self.vehicle_id = vehicle_id
         self.registration_number = registration_number
         self.make = make
         self.model = model
