@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from typing import Optional
+from uuid import UUID
 
 from app.models.customer import Customer
 from app.models.vehicle import Vehicle
@@ -10,6 +11,7 @@ from app.models.vehicle import Vehicle
 class Reservation:
     def __init__(
         self,
+        reservation_id: UUID,
         customer: Customer,
         vehicle: Optional[Vehicle],
         start: datetime,
@@ -17,7 +19,7 @@ class Reservation:
     ):
         if end < start:
             raise ValueError("end date can't be earlier than start date.")
-
+        self.reservation_id = reservation_id
         self.customer = customer
         self.vehicle = vehicle
         self.start = start
