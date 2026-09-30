@@ -50,7 +50,17 @@ jobs:
 
       - name: Initialize database
         run: |
-          PGPASSWORD="$FLEETOPS_DB_PASSWORD" psql -h "$FLEETOPS_DB_HOST" -U "$FLEETOPS_DB_USER" -d "$FLEETOPS_DB_NAME" -f docker/postgres/init.sql
+          PGPASSWORD="$FLEETOPS_DB_PASSWORD" psql \
+            -h "$FLEETOPS_DB_HOST" \
+            -U "$FLEETOPS_DB_USER" \
+            -d "$FLEETOPS_DB_NAME" \
+            -c "CREATE DATABASE fleetops_test;"
+
+          PGPASSWORD="$FLEETOPS_DB_PASSWORD" psql \
+            -h "$FLEETOPS_DB_HOST" \
+            -U "$FLEETOPS_DB_USER" \
+            -d fleetops_test \
+            -f docker/postgres/init.sql
 
       - name: Run tests
         run: pytest
