@@ -13,6 +13,27 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      FLEETOPS_DB_HOST: localhost
+      FLEETOPS_DB_NAME: fleetops
+      FLEETOPS_DB_USER: creativity
+      FLEETOPS_DB_PASSWORD: ci-password
+
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_DB: fleetops
+          POSTGRES_USER: creativity
+          POSTGRES_PASSWORD: ci-password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U creativity -d fleetops"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -26,6 +47,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+
+      - name: Initialize database
+        run: |
+          PGPASSWORD="$FLEETOPS_DB_PASSWORD" psql -h "$FLEETOPS_DB_HOST" -U "$FLEETOPS_DB_USER" -d "$FLEETOPS_DB_NAME" -f docker/postgres/init.sql
 
       - name: Run tests
         run: pytest
