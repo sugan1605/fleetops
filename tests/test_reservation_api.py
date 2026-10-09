@@ -15,9 +15,12 @@ client = TestClient(app)
 
 
 @pytest.fixture
-def test_database(monkeypatch):
+def database_environment(monkeypatch):
     monkeypatch.setenv("FLEETOPS_DB_NAME", "fleetops_test")
 
+
+@pytest.fixture
+def test_database(database_environment):
     customer_repository = CustomerRepository()
     vehicle_repository = VehicleRepository()
 
@@ -150,7 +153,7 @@ def test_get_reservation(test_database):
             "customer_id": customer.customer_id,
             "vehicle_id": str(vehicle.vehicle_id),
             "start" : start.isoformat(),
-            "end" : end.isoformat()
+            "end" : end.isoformat(),
         },
     )
 
@@ -171,7 +174,7 @@ def test_get_reservation(test_database):
     assert datetime.fromisoformat(data["end"]) == end
 
 
-def test_get_reservation_not_found():
+def test_get_reservation_not_found(database_environment):
     reservation_id = uuid4()
 
     response = client.get(f"/reservations/{reservation_id}")

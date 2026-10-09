@@ -2,6 +2,7 @@ import os
 
 import psycopg
 
+
 def get_connection():
     database_host = os.getenv("FLEETOPS_DB_HOST", "localhost")
     database_name = os.getenv("FLEETOPS_DB_NAME", "fleetops")
