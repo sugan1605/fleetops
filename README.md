@@ -1,173 +1,116 @@
 # FleetOps 🚗
 
-A fictional fleet and rental operations platform inspired by real-world
-car rental workflows.
+FleetOps is a fictional fleet and rental operations platform inspired by real-world car rental workflows.
 
+I'm building it to strengthen my Python skills and learn how applications are built, tested, deployed and operated. My main focus is DevOps and platform engineering.
 
-## Purpose
+## What it does
 
-FleetOps is a hands-on project where I am building a rental operations
-system from the ground up.
+FleetOps models the core rental lifecycle, including:
 
-I use the project to strengthen my Python and software engineering skills
-while progressively introducing technologies and practices used in Cloud
-and DevOps.
+- Customer and vehicle validation
+- Vehicle availability and time-based blocks
+- Reservations and vehicle assignment
+- Rental extensions and overlap prevention
+- Vehicle returns and rental completion
+- Employee check-in, odometer and fuel recording
+- Vehicle condition and operational status management
+- Vehicle preparation before it becomes available again
 
-The idea is simple: start with the rental lifecycle and build the
-engineering around it step by step.
+## Engineering and DevOps
 
+I'm using FleetOps to practise the tools and workflows involved in delivering and operating software.
 
-## Core Rental Lifecycle
+- **Python:** application logic and business rules
+- **PostgreSQL and SQL:** relational data and database integration
+- **pytest:** automated testing
+- **Ruff:** linting and code quality
+- **Docker:** containerised application and non-root execution
+- **Git and GitHub:** version control, branches and pull requests
+- **GitHub Actions:** automated testing, linting and Docker image builds
+- **Linux:** deployment, logs, service troubleshooting and recovery
 
-The project currently covers the core domain logic for vehicles,
-customers, reservations and rentals.
+## Homelab
 
-The system handles:
+I use a homelab built around an Ubuntu Linux VM to practise operational tasks in a controlled environment.
 
-- Customer validation
-- Vehicle validation
-- Vehicle availability
-- Time-based vehicle blocks
-- Reservations
-- Vehicle assignment
-- Rental validation
-- Rental extensions
-- Prevention of overlapping rentals
-- Active rentals
-- Vehicle returns
-- Early, on-time and late returns
-- Rental completion when a vehicle is returned
-- Employee check-in
-- Odometer and fuel recording
-- Vehicle condition recording
-- Vehicle `DIRTY` status after check-in
-- Returning a prepared vehicle to `AVAILABLE`
+This gives me hands-on experience with:
 
+- Linux administration and command-line troubleshooting
+- SSH and remote access
+- Running and inspecting Docker containers
+- Container networking and application-to-database connectivity
+- Service health, logs and recovery
+- Running the FleetOps API as a non-root user
 
-### Current lifecycle
+The homelab lets me experiment, troubleshoot failures and document what I learn without relying on a continuously running cloud environment.
 
-```text
-AVAILABLE
-    ↓
-RESERVED
-    ↓
-ON_A_RENT
-    ↓
-Customer returns vehicle
-    ↓
-Rental COMPLETED
-    ↓
-Employee check-in
-    ↓
-Vehicle DIRTY
-    ↓
-Cleaning / preparation
-    ↓
-AVAILABLE
+## Continuous Integration
+
+FleetOps uses GitHub Actions to validate changes automatically.
+
+The CI pipeline:
+
+1. Sets up Python and installs dependencies.
+2. Runs Ruff checks.
+3. Starts PostgreSQL for integration tests.
+4. Initialises the test database.
+5. Runs the automated test suite.
+6. Builds the Docker image.
+
+The pipeline helps catch problems before changes are merged into `main`.
+
+I've also documented a hands-on CI debugging exercise where I investigated a failed database initialisation step, identified a configuration mismatch and verified the fix through a successful pipeline run.
+
+## Testing
+
+FleetOps uses `pytest` for automated testing, integrated into GitHub Actions.
+
+The test suite covers domain logic, validation, repository behaviour, vehicle availability, reservations, rental workflows, returns and operational status changes.
+
+Run the tests locally:
+
+```bash
+python -m pytest
 ```
 
+Run the code quality checks:
 
-## Engineering Focus
-
-The project will progressively cover:
-
-- Python
-- REST APIs
-- PostgreSQL
-- SQL and data modelling
-- Automated testing
-- Error handling
-- Docker
-- Git and GitHub
-- CI/CD
-- Azure
-- Infrastructure as Code with Terraform
-- Kubernetes
-- Monitoring and observability
-- Security and configuration management
-
+```bash
+ruff check .
+```
 
 ## Project Structure
 
 ```text
 fleetops/
 ├── app/
-│   ├── models/
-│   ├── services/
-│   └── main.py
+├── docker/
+│   └── postgres/
+│       └── init.sql
 ├── docs/
+│   ├── ci-debugging-exercise.md
+│   ├── domain-model.md
+│   └── linux-deployment.md
+├── scripts/
 ├── tests/
-├── .gitignore
+├── .github/
+│   └── workflows/
+├── Dockerfile
+├── compose.yaml
 ├── pyproject.toml
+├── requirements.txt
 └── README.md
 ```
 
+## Current Focus
 
-## Testing
+The core rental lifecycle is implemented and covered by automated tests. The project has progressed into containerisation, Linux operations and CI.
 
-FleetOps uses `pytest` for automated testing.
+My next steps are Azure Container Registry, Terraform, Kubernetes, deployment automation, monitoring and security.
 
-The tests currently cover:
+## How I Work
 
-- Customer and rental validation
-- Vehicle availability
-- Vehicle blocks
-- Vehicle assignment
-- Rental extensions
-- Rental overlap prevention
-- Rental returns
-- Early, on-time, and late returns
-- Rental state changes
-- Vehicle check-in
-- Odometer updates
-- Vehicle operational status changes
-- Invalid inputs and business rules
+Understand → Design → Build → Test → Debug → Improve
 
-**Current status: 61 tests passing**
-
-Run the test suite with:
-
-```bash
-python3 -m pytest
-```
-
-Run the code quality checks with:
-
-```bash
-ruff check .
-```
-
-
-## Project Status
-
-🚧 **Core Rental Lifecycle — In Progress **
-
-The core rental domain is implemented and covered by automated tests.
-
-Current development is focused on completing the reservation-to-rental workflow.
-
-The next phase will expand the application around the domain, starting with the
-API and database before progressively introducing containerization, CI/CD, cloud infrastructure
-and Kubernetes.
-
-
-## Development Philosophy
-
-FleetOps is developed through hands-on problem solving:
-
-Understand
-    ↓
-Design
-    ↓
-Build
-    ↓
-Test
-    ↓
-Debug
-    ↓
-Improve
-    ↓
-Commit
-
-The goal is to build a realistic project while developing an understanding
-of how software engineering and DevOps practices work together.
+I prefer learning by building, breaking things, investigating the cause and fixing them. FleetOps gives me a practical environment to develop those habits while connecting software development with DevOps and platform engineering.
