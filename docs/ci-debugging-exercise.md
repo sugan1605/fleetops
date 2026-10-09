@@ -2,84 +2,91 @@
 
 ## Purpose
 
-This exercise intentionally introduces a controlled failure into the
-FleetOps CI pipeline to practice diagnosing and recovering from CI failures.
-
-The failure will be introduced on the `feature/ci` branch and will not
-represent a real application defect.
-
-The goal is to practice the workflow used when a CI pipeline fails:
-
-1. Identify the failing stage.
-2. Read and interpret the CI logs.
-3. Isolate the root cause.
-4. Make the smallest appropriate fix.
-5. Verify the fix locally where possible.
-6. Push the correction.
-7. Confirm that CI returns to a passing state.
+This exercise simulates a teammate introducing an unexpected change to the FleetOps CI configuration. The goal was to practise investigating an unfamiliar CI failure, identifying the root cause, implementing a minimal fix, and verifying recovery.
 
 ## Baseline
 
-Before introducing the failure, the FleetOps CI pipeline successfully:
+Before the exercise, the FleetOps CI pipeline successfully:
 
 - Installs Python dependencies
-- Runs Ruff
+- Runs Ruff linting
 - Builds the Docker image
 - Initializes the PostgreSQL test database
 - Runs the automated test suite
 
-At the time of this exercise, the test suite contains 79 tests.
+The test suite contained 79 tests at the time of the exercise.
 
+## Failure
 
-## Intentional Failure
+**Failing stage:** Initialize database
 
-_To be completed after the failure has been introduced._
+**Observed error:**
 
-### Failure observed
+```text
+psql: error: connection to server at "localhost" (::1),
+port 5432 failed: FATAL: database "fleetops_ci" does not exist
+```
 
-_To be completed._
-
-### Failing CI stage
-
-_To be completed._
-
-### Error message
-
-_To be completed._
+GitHub Actions exited with code 2.
 
 ## Investigation
 
-_To be completed while diagnosing the failure._
+The investigation followed the available evidence rather than assuming PostgreSQL itself was broken.
 
-### Steps taken
-
-_To be completed._
+1. Inspected the failed GitHub Actions step and its error output.
+2. Distinguished a database-selection error from a server connectivity failure.
+3. Used `sed -n '15,30p' .github/workflows/ci.yml` to inspect the CI environment and PostgreSQL service configuration.
+4. Compared `FLEETOPS_DB_NAME` with the PostgreSQL service's `POSTGRES_DB` setting.
+5. Confirmed that the initialization command attempted to connect to a database name that the service had not created.
 
 ## Root Cause
 
-_To be completed after the root cause has been confirmed._
+The CI workflow contained inconsistent database configuration:
+
+- `FLEETOPS_DB_NAME` was set to `fleetops_ci`.
+- `POSTGRES_DB` was set to `fleetops`.
+
+The initialization step used `FLEETOPS_DB_NAME` to select the database for its first `psql` connection. PostgreSQL initialized `fleetops`, but the command attempted to connect to `fleetops_ci`.
+
+Because that database did not exist, the connection failed before the `CREATE DATABASE fleetops_test` statement could execute.
+
+The root cause was a **CI configuration mismatch**, not a Python application defect or a PostgreSQL server startup failure.
 
 ## Fix
 
-_To be completed after the fix has been implemented._
+Changed the workflow environment variable to match the database created by the PostgreSQL service:
+
+```yaml
+FLEETOPS_DB_NAME: fleetops
+```
+
+No application code or database schema changes were required.
 
 ## Verification
 
-_To be completed after CI passes again._
+After the correction, GitHub Actions completed successfully.
 
-Expected verification:
+- Ruff linting passed.
+- Docker image build passed.
+- PostgreSQL initialization passed.
+- The automated test suite passed.
+- The workflow returned to a green state.
 
-- Ruff passes
-- Docker image builds successfully
-- PostgreSQL initializes successfully
-- Automated tests pass
-- GitHub Actions returns to a passing state
+**Evidence:**
+
+- Failed run: CI #10, commit `c1be3e2` — `test: simulate CI configuration change`
+- Successful recovery: CI #11, commit `2572676` — `fix: correct CI database configuration`
 
 ## What I Learned
 
-_To be completed after the exercise._
+- Read the first meaningful error instead of guessing at the cause.
+- A reachable database server does not guarantee that the requested database exists.
+- Compare environment variables with service initialization settings.
+- `psql -d` selects the database to connect to; SQL commands cannot execute until that connection succeeds.
+- Local Docker Compose behavior and GitHub Actions service configuration are separate environments.
+- A small, evidence-based configuration fix is preferable to changing multiple components at once.
+- A passing CI run after the correction provides evidence that the failure was resolved.
 
-## Evidence
+## Debugging Workflow
 
-The GitHub Actions run containing the intentional failure and the
-subsequent successful run provide the CI execution history for this exercise.
+Observe → Reproduce where possible → Inspect → Isolate → Fix → Verify → Document.
