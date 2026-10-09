@@ -15,7 +15,7 @@ jobs:
 
     env:
       FLEETOPS_DB_HOST: localhost
-      FLEETOPS_DB_NAME: fleetops_ci
+      FLEETOPS_DB_NAME: fleetops
       FLEETOPS_DB_USER: creativity
       FLEETOPS_DB_PASSWORD: ci-password
 
