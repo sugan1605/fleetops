@@ -2,7 +2,7 @@
 
 FleetOps is a fictional fleet and rental operations platform inspired by real-world car rental workflows.
 
-I'm building it to strengthen my Python skills and learn how applications are built, tested, deployed and operated. My main focus is DevOps and platform engineering.
+I'm building it to strengthen my Python skills and understand how applications are developed, tested, deployed and operated. My main focus is **Cloud Engineering, DevOps and Platform Engineering**, with AWS as my cloud platform of choice.
 
 ## What it does
 
@@ -21,14 +21,14 @@ FleetOps models the core rental lifecycle, including:
 
 I'm using FleetOps to practise the tools and workflows involved in delivering and operating software.
 
-- **Python:** application logic and business rules
-- **PostgreSQL and SQL:** relational data and database integration
-- **pytest:** automated testing
-- **Ruff:** linting and code quality
-- **Docker:** containerised application and non-root execution
-- **Git and GitHub:** version control, branches and pull requests
-- **GitHub Actions:** automated testing, linting and Docker image builds
-- **Linux:** deployment, logs, service troubleshooting and recovery
+- **Python:** Application logic and business rules
+- **PostgreSQL and SQL:** Relational data and database integration
+- **pytest:** Automated testing
+- **Ruff:** Linting and code quality
+- **Docker:** Containerised application and non-root execution
+- **Git and GitHub:** Version control, branches and pull requests
+- **GitHub Actions:** Automated testing, linting and Docker image builds
+- **Linux:** Deployment, logs, service troubleshooting and recovery
 
 ## Homelab
 
@@ -103,14 +103,24 @@ fleetops/
 └── README.md
 ```
 
-## Current Focus
+## Current Focus: AWS Cloud Engineering
 
-The core rental lifecycle is implemented and covered by automated tests. The project has progressed into containerisation, Linux operations and CI.
+With the application, containerisation, Linux operations and CI foundations in place, I'm now working towards running FleetOps in AWS.
 
-My next steps are Azure Container Registry, Terraform, Kubernetes, deployment automation, monitoring and security.
+My planned learning and implementation roadmap:
+
+1. **AWS fundamentals:** IAM, VPC, subnets, routing and security groups.
+2. **Container deployment:** Amazon ECR and ECS Fargate.
+3. **Infrastructure as Code:** Terraform to provision and manage AWS resources.
+4. **CI/CD:** Automating deployments with GitHub Actions and AWS.
+5. **Monitoring and observability:** CloudWatch, logging and service health.
+6. **Security:** IAM permissions, secrets management and secure networking.
+7. **Kubernetes:** Exploring container orchestration after establishing the AWS deployment foundations.
+
+The goal is to build, deploy, secure and operate the application while understanding the infrastructure behind it.
 
 ## How I Work
 
-Understand → Design → Build → Test → Debug → Improve
+**Understand → Design → Build → Test → Debug → Improve**
 
-I prefer learning by building, breaking things, investigating the cause and fixing them. FleetOps gives me a practical environment to develop those habits while connecting software development with DevOps and platform engineering.
+I prefer learning by building, breaking things, investigating the cause and fixing them. FleetOps gives me a practical environment to develop those habits while connecting software engineering with cloud infrastructure and operations.
