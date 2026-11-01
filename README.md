@@ -1,126 +1,143 @@
-# FleetOps 🚗
+# FleetOps
 
-FleetOps is a fictional fleet and rental operations platform inspired by real-world car rental workflows.
+**A hands-on cloud engineering project focused on building, containerising and deploying a Python-based fleet management API.**
 
-I'm building it to strengthen my Python skills and understand how applications are developed, tested, deployed and operated. My main focus is **Cloud Engineering, DevOps and Platform Engineering**, with AWS as my cloud platform of choice.
+FleetOps is a fleet management system inspired by operational workflows in the vehicle rental industry. The project provides a practical environment for developing backend engineering, cloud infrastructure and automation skills.
 
-## What it does
+The goal is to build a working application and progressively take responsibility for the infrastructure, deployment, security and operations behind it.
 
-FleetOps models the core rental lifecycle, including:
+## Project Goals
 
-- Customer and vehicle validation
-- Vehicle availability and time-based blocks
-- Reservations and vehicle assignment
-- Rental extensions and overlap prevention
-- Vehicle returns and rental completion
-- Employee check-in, odometer and fuel recording
-- Vehicle condition and operational status management
-- Vehicle preparation before it becomes available again
+- Build and maintain a Python REST API.
+- Work with PostgreSQL and database integration.
+- Develop reliable testing and code-quality practices.
+- Containerise the application with Docker.
+- Build CI/CD workflows using GitHub Actions.
+- Provision and manage cloud infrastructure using AWS and Terraform.
+- Develop practical Linux, networking and troubleshooting skills.
+- Understand monitoring, security and operational practices.
 
-## Engineering and DevOps
+## Technology Stack
 
-I'm using FleetOps to practise the tools and workflows involved in delivering and operating software.
+| Area | Technologies |
+|---|---|
+| Backend | Python, REST API |
+| Database | PostgreSQL |
+| Testing | pytest |
+| Code quality | Ruff |
+| Containers | Docker, Docker Compose |
+| CI/CD | GitHub Actions |
+| Cloud | AWS |
+| Infrastructure as Code | Terraform (planned) |
+| Operating systems | Linux, Ubuntu |
+| Version control | Git, GitHub |
 
-- **Python:** Application logic and business rules
-- **PostgreSQL and SQL:** Relational data and database integration
-- **pytest:** Automated testing
-- **Ruff:** Linting and code quality
-- **Docker:** Containerised application and non-root execution
-- **Git and GitHub:** Version control, branches and pull requests
-- **GitHub Actions:** Automated testing, linting and Docker image builds
-- **Linux:** Deployment, logs, service troubleshooting and recovery
+## Engineering & DevOps
 
-## Homelab
+### Application Development
 
-I use a homelab built around an Ubuntu Linux VM to practise operational tasks in a controlled environment.
+- Python-based REST API.
+- PostgreSQL integration.
+- Structured application architecture.
+- Automated tests with pytest.
+- Code quality checks using Ruff.
 
-This gives me hands-on experience with:
+### Containers
 
-- Linux administration and command-line troubleshooting
-- SSH and remote access
-- Running and inspecting Docker containers
-- Container networking and application-to-database connectivity
-- Service health, logs and recovery
-- Running the FleetOps API as a non-root user
+- Dockerised application.
+- Docker Compose for local multi-container development.
+- Container networking and environment configuration.
+- Troubleshooting container and database connectivity.
 
-The homelab lets me experiment, troubleshoot failures and document what I learn without relying on a continuously running cloud environment.
+### Continuous Integration
 
-## Continuous Integration
+GitHub Actions is used to automate the CI workflow.
 
-FleetOps uses GitHub Actions to validate changes automatically.
+Current CI responsibilities:
+- Run automated tests.
+- Run Ruff checks.
+- Build the Docker image.
 
-The CI pipeline:
+### Linux & Homelab
 
-1. Sets up Python and installs dependencies.
-2. Runs Ruff checks.
-3. Starts PostgreSQL for integration tests.
-4. Initialises the test database.
-5. Runs the automated test suite.
-6. Builds the Docker image.
+A Linux environment is used for practical exercises involving:
 
-The pipeline helps catch problems before changes are merged into `main`.
+- Linux operations and command-line tools.
+- SSH access and remote administration.
+- Application execution and troubleshooting.
+- Networking and service connectivity.
 
-I've also documented a hands-on CI debugging exercise where I investigated a failed database initialisation step, identified a configuration mismatch and verified the fix through a successful pipeline run.
+## AWS Cloud Engineering
 
-## Testing
+AWS is the primary cloud platform for the next stage of FleetOps.
 
-FleetOps uses `pytest` for automated testing, integrated into GitHub Actions.
+The objective is to understand the infrastructure behind a cloud-hosted application rather than simply deploy it and move on.
 
-The test suite covers domain logic, validation, repository behaviour, vehicle availability, reservations, rental workflows, returns and operational status changes.
+### AWS work completed
 
-Run the tests locally:
+Initial networking and security exploration in the Stockholm region (`eu-north-1`).
 
-```bash
-python -m pytest
-```
+- Inspected VPC architecture and IPv4 CIDR ranges.
+- Explored subnets across multiple Availability Zones.
+- Examined route tables and Internet Gateway routing.
+- Learned how local routes enable communication within a VPC.
+- Created dedicated security groups for the planned application architecture:
 
-Run the code quality checks:
+| Security Group | Inbound access |
+|---|---|
+| `fleetops-alb-sg` | HTTPS — TCP 443 from `0.0.0.0/0` |
+| `fleetops-api-sg` | TCP 8000 from the ALB security group |
+| `fleetops-db-sg` | PostgreSQL — TCP 5432 from the API security group |
 
-```bash
-ruff check .
-```
+These security groups currently exist in the default VPC. They are not yet attached to deployed application or database resources.
 
-## Project Structure
+### Planned AWS architecture
 
-```text
-fleetops/
-├── app/
-├── docker/
-│   └── postgres/
-│       └── init.sql
-├── docs/
-│   ├── ci-debugging-exercise.md
-│   ├── domain-model.md
-│   └── linux-deployment.md
-├── scripts/
-├── tests/
-├── .github/
-│   └── workflows/
-├── Dockerfile
-├── compose.yaml
-├── pyproject.toml
-├── requirements.txt
-└── README.md
-```
+The next phase is to build a dedicated VPC for FleetOps and progressively deploy the application.
 
-## Current Focus: AWS Cloud Engineering
+Planned components:
 
-With the application, containerisation, Linux operations and CI foundations in place, I'm now working towards running FleetOps in AWS.
+- Dedicated VPC with public and private subnets.
+- Internet Gateway and route tables.
+- Purpose-specific security groups.
+- AWS Identity and Access Management (IAM).
+- Amazon Elastic Container Registry (ECR).
+- Amazon ECS with Fargate.
+- PostgreSQL database deployment.
+- CloudWatch monitoring and logging.
+- Terraform for infrastructure provisioning.
+- GitHub Actions deployment workflow using AWS OIDC authentication.
 
-My planned learning and implementation roadmap:
+Kubernetes and Amazon EKS are later learning goals, once the fundamentals of cloud infrastructure and container orchestration are established.
 
-1. **AWS fundamentals:** IAM, VPC, subnets, routing and security groups.
-2. **Container deployment:** Amazon ECR and ECS Fargate.
-3. **Infrastructure as Code:** Terraform to provision and manage AWS resources.
-4. **CI/CD:** Automating deployments with GitHub Actions and AWS.
-5. **Monitoring and observability:** CloudWatch, logging and service health.
-6. **Security:** IAM permissions, secrets management and secure networking.
-7. **Kubernetes:** Exploring container orchestration after establishing the AWS deployment foundations.
+## Current Project Focus
 
-The goal is to build, deploy, secure and operate the application while understanding the infrastructure behind it.
+The current focus is **AWS Cloud Engineering**.
+
+The development path is:
+
+1. AWS networking and security fundamentals.
+2. Dedicated VPC architecture.
+3. Terraform and Infrastructure as Code.
+4. Container deployment using Amazon ECS and Fargate.
+5. PostgreSQL connectivity and application configuration.
+6. GitHub Actions CI/CD deployment.
+7. Monitoring, logging and security.
+8. Further exploration of Kubernetes and EKS.
 
 ## How I Work
 
-**Understand → Design → Build → Test → Debug → Improve**
+FleetOps is developed incrementally, with an emphasis on understanding the reasoning behind technical decisions.
 
-I prefer learning by building, breaking things, investigating the cause and fixing them. FleetOps gives me a practical environment to develop those habits while connecting software engineering with cloud infrastructure and operations.
+- Build and test before expanding functionality.
+- Keep changes small and focused.
+- Document important implementation decisions.
+- Investigate and troubleshoot problems rather than simply applying workarounds.
+- Use GitHub issues and a Kanban board to track progress.
+- Keep documentation aligned with the actual state of the project.
+
+## Objective
+
+FleetOps is intended to become a practical portfolio project demonstrating the ability to build an application, understand its infrastructure, automate its deployment and troubleshoot it in a cloud environment.
+
+The long-term goal is to develop the skills required for Cloud Engineering, DevOps and Platform Engineering roles.
